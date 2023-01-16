@@ -41,14 +41,13 @@ export class ProfileApis extends GenericApi {
             cognitoUserPools: [props.cognito.userPool]
         })
 
-        const profilesApiResource = this.api.root.addResource('profiles')
-        const profileAccountIdResource = profilesApiResource.addResource('{accountId}')
+        const profileAccountIdResource = this.api.root.addResource('{accountId}')
 
         this.listApi = this.addMethod({
             functionName: 'profile-list',
             handlerName: 'profile-list-handler.ts',
             verb: 'GET',
-            resource: profilesApiResource,
+            resource: this.api.root,
             environment: {
                 PROFILE_TABLE: props.profileTable.table.tableName
             },
@@ -74,7 +73,7 @@ export class ProfileApis extends GenericApi {
             functionName: 'profile-post',
             handlerName: 'profile-create-handler.ts',
             verb: 'POST',
-            resource: profilesApiResource,
+            resource: this.api.root,
             environment: {
                 PROFILE_TABLE: props.profileTable.table.tableName
             },
@@ -88,7 +87,7 @@ export class ProfileApis extends GenericApi {
             functionName: 'profile-put',
             handlerName: 'profile-edit-handler.ts',
             verb: 'PUT',
-            resource: profilesApiResource,
+            resource: this.api.root,
             environment: {
                 PROFILE_TABLE: props.profileTable.table.tableName
             },

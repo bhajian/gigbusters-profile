@@ -6,7 +6,7 @@ import {
     Model,
     RequestValidator,
     RestApi,
-    DomainName, BasePathMapping, Cors,
+    DomainName, BasePathMapping, Cors, IResource,
 } from "aws-cdk-lib/aws-apigateway";
 import {NodejsFunction} from "aws-cdk-lib/aws-lambda-nodejs";
 import {join} from "path";
@@ -24,7 +24,7 @@ export interface Methodprops {
     functionName: string
     handlerName: string
     verb: string
-    resource: Resource
+    resource: IResource
     environment: any
     bodySchema?: JsonSchema
     validateRequestBody: boolean
