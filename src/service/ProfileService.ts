@@ -74,7 +74,7 @@ export class ProfileService {
             .delete({
                 TableName: this.props.table,
                 Key: {
-                    id: params.accountId,
+                    accountId: params.accountId,
                 },
                 ConditionExpression: 'userId = :userId',
                 ExpressionAttributeValues : {':userId' : params.userId}
