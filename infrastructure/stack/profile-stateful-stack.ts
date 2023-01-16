@@ -8,7 +8,7 @@ import {FameorbitCognito} from "../lib/construct/fameorbit-cognito";
 import {AttributeType, StreamViewType} from "aws-cdk-lib/aws-dynamodb";
 
 
-export class TodoAppStatefulStack extends Stack {
+export class ProfileStatefulStack extends Stack {
     public profileTable: GenericDynamoTable
     public profilePhotoBucket: Bucket
     public uploadProfilePhotosPolicy: PolicyStatement
@@ -45,7 +45,7 @@ export class TodoAppStatefulStack extends Stack {
     }
 
     private initializeTodosPhotosBucket() {
-        this.profilePhotoBucket = new Bucket(this, 'todo-photos', {
+        this.profilePhotoBucket = new Bucket(this, 'profile-photos', {
             removalPolicy: RemovalPolicy.DESTROY,
             bucketName: 'profile-photos-' + this.suffix,
             cors: [{

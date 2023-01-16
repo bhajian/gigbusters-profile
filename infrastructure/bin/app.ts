@@ -1,17 +1,17 @@
 #!/usr/bin/env node
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
-import { TodoAppStack } from '../stack/todo-app-stack';
-import {TodoAppStatefulStack} from "../stack/todo-app-stateful-stack";
+import { ProfileApiStack } from '../stack/profile-api-stack';
+import {ProfileStatefulStack} from "../stack/profile-stateful-stack";
 
 const app = new cdk.App();
 
-const statefulStack = new TodoAppStatefulStack(app, 'TodoStatefulStack', {
+const statefulStack = new ProfileStatefulStack(app, 'ProfileStatefulStack', {
     env: {
         account: process.env.CDK_DEFAULT_ACCOUNT,
         region: process.env.CDK_DEFAULT_REGION
     }})
-new TodoAppStack(app, 'TodoApiStack', {
+new ProfileApiStack(app, 'ProfileApiStack', {
     todoAppStatefulStack: statefulStack,
 }, {
     env: {

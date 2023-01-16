@@ -28,8 +28,8 @@ export async function handler(event: APIGatewayProxyEvent, context: Context):
         const item = getEventBody(event) as ProfileCreateParams;
         const sub = getSub(event)
         item.userId = sub
-        const todo = await todoService.create(item)
-        result.body = JSON.stringify(todo)
+        const profile = await todoService.create(item)
+        result.body = JSON.stringify(profile)
     } catch (error) {
         result.statusCode = 500
         result.body = error.message

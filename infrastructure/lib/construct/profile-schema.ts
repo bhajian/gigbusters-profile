@@ -90,7 +90,6 @@ export const createProfileSchema = {
             type: JsonSchemaType.ARRAY,
             items: {
                 type: JsonSchemaType.OBJECT,
-                required: [],
                 properties: {
                     snName: {
                         type: JsonSchemaType.STRING,
@@ -209,7 +208,6 @@ export const editProfileSchema = {
             type: JsonSchemaType.ARRAY,
             items: {
                 type: JsonSchemaType.OBJECT,
-                required: [],
                 properties: {
                     snName: {
                         type: JsonSchemaType.STRING,

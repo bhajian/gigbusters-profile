@@ -17,24 +17,25 @@ export function getEventHeaders(event: APIGatewayProxyEvent): any {
 export function getSub(event: APIGatewayProxyEvent): string {
     const headers = typeof event.headers == 'object' ? event.headers : JSON.parse(event.headers)
     let jwt = ''
-    if(headers['Authorization']){
+    if(headers && headers['Authorization']){
         const authorizationHeader: string = headers['Authorization']
         const stringArr = authorizationHeader.split(' ')
         if(stringArr[0] === 'Bearer' || stringArr[0] === 'bearer')
             jwt = stringArr[1]
         else
             jwt = stringArr[0]
+        let decoded: any = jwt_decode(jwt)
+        return decoded.sub ? decoded.sub : ''
     }
-    let decoded: any = jwt_decode(jwt)
-    return decoded.sub ? decoded.sub : ''
+    throw new Error('Authorization header is not empty or cannot be parsed.')
 }
 
-export function  getPathParameter(event: APIGatewayProxyEvent, parameter: string) {
+export function  getPathParameter(event: APIGatewayProxyEvent, parameter: string): string {
     const value: string | undefined = event.pathParameters
         ? event['pathParameters'][parameter]
         : undefined
     if (!value) {
-        throw new ExternalError(400, 'Path must contain path parameter `id`.')
+        throw new ExternalError(400, `Path must contain path parameter ${parameter}.`)
     }
     return value
 }
@@ -47,7 +48,7 @@ export function getQueryString(event: APIGatewayProxyEvent,
         value = queryStringParameters[parameter!];
     }
     if (!value) {
-        throw new ExternalError(400, 'Path must contain path parameter `id`.')
+        throw new ExternalError(400, `Path must contain path parameter ${parameter}.`)
     }
     return value
 }

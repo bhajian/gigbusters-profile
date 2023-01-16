@@ -7,14 +7,14 @@ import {GenericCognito} from "../generic/GenericCognito";
 import {UserPool} from "aws-cdk-lib/aws-cognito";
 import config from "../../config/config";
 
-export interface TodoCognitoProps {
+export interface ProfileCognitoProps {
     suffixId: string
 }
 
 export class FameorbitCognito extends GenericCognito {
     suffixId: string
 
-    public constructor(scope: Construct, id: string, props: TodoCognitoProps) {
+    public constructor(scope: Construct, id: string, props: ProfileCognitoProps) {
         super(scope, id, props)
         this.suffixId = props.suffixId
         this.initializeCognito()
@@ -29,7 +29,8 @@ export class FameorbitCognito extends GenericCognito {
             userNameSignInAliases: true,
             phoneSignInAliases: false,
             certificateArn: config.authDomainCertificateArn,
-            customDomainName: [config.authSubdomain, config.rootDomain].join('.'),
+            authSubdomain: config.authSubdomain,
+            rootDomain: config.rootDomain
         })
 
         this.createUserPoolClient({

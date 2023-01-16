@@ -35,7 +35,7 @@ export class ProfileService {
             .get({
                 TableName: this.props.table,
                 Key: {
-                    id: params.id,
+                    accountId: params.accountId,
                 },
             }).promise()
         if (response.Item === undefined ||
@@ -47,7 +47,7 @@ export class ProfileService {
 
     async create(params: ProfileCreateParams): Promise<ProfileEntity> {
         const todo: ProfileEntity = {
-            id: uuidv4(),
+            accountId: uuidv4(),
             ...params,
         }
         const response = await this.documentClient
@@ -74,7 +74,7 @@ export class ProfileService {
             .delete({
                 TableName: this.props.table,
                 Key: {
-                    id: params.id,
+                    id: params.accountId,
                 },
                 ConditionExpression: 'userId = :userId',
                 ExpressionAttributeValues : {':userId' : params.userId}

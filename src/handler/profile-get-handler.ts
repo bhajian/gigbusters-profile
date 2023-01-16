@@ -7,8 +7,8 @@ import {Env} from "../lib/env";
 import {ProfileService} from "../service/ProfileService";
 import {getPathParameter, getQueryString, getSub} from "../lib/utils";
 
-const table = Env.get('TODO_TABLE')
-const todoService = new ProfileService({
+const table = Env.get('PROFILE_TABLE')
+const profileService = new ProfileService({
     table: table
 })
 
@@ -24,13 +24,20 @@ export async function handler(event: APIGatewayProxyEvent, context: Context):
         },
         body: ''
     }
-    const id = getPathParameter(event, 'id')
-    const sub = getSub(event)
-    const todo = await todoService.get({
-        id: id,
-        userId: sub
-    })
+    try {
+        const accountId = getPathParameter(event, 'accountId')
+        const sub = getSub(event)
+            const profile = await profileService.get({
+                accountId: accountId,
+                userId: sub
+            })
+            result.body = JSON.stringify(profile)
+            return result
+        }
 
-    result.body = JSON.stringify(todo)
+    catch (e) {
+        result.statusCode = 500
+        result.body = e.message
+    }
     return result
 }

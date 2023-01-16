@@ -2,15 +2,15 @@ import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import {Stack} from "aws-cdk-lib";
 import {ProfileApis} from "../lib/construct/profile-apis";
-import {TodoAppStatefulStack} from "./todo-app-stateful-stack";
+import {ProfileStatefulStack} from "./profile-stateful-stack";
 import {FameorbitCognito} from "../lib/construct/fameorbit-cognito";
 
 
 export interface TodoAppProps{
-  todoAppStatefulStack: TodoAppStatefulStack
+  todoAppStatefulStack: ProfileStatefulStack
 }
 
-export class TodoAppStack extends Stack {
+export class ProfileApiStack extends Stack {
 
   public todoApis:ProfileApis
 

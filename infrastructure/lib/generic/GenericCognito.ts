@@ -7,14 +7,12 @@ import {
     UserPool,
     UserPoolClient, UserPoolEmail, VerificationEmailStyle
 } from "aws-cdk-lib/aws-cognito";
-import {CfnOutput, RemovalPolicy} from "aws-cdk-lib";
+import {aws_route53_targets, CfnOutput, RemovalPolicy} from "aws-cdk-lib";
 import {CognitoUserPoolsAuthorizer} from "aws-cdk-lib/aws-apigateway";
 import {FederatedPrincipal, Role} from "aws-cdk-lib/aws-iam";
 import {PolicyStatement} from "aws-cdk-lib/aws-iam/lib/policy-statement";
 import {Certificate} from "aws-cdk-lib/aws-certificatemanager";
 import {ARecord, HostedZone, RecordTarget} from "aws-cdk-lib/aws-route53";
-import {ApiGateway} from "aws-cdk-lib/aws-route53-targets";
-import {UserPoolDomainTarget} from "aws-cdk-lib/aws-route53-targets/lib/userpool-domain";
 
 export interface UserPoolProps {
     id: string
@@ -24,7 +22,8 @@ export interface UserPoolProps {
     userNameSignInAliases: boolean
     phoneSignInAliases: boolean
     certificateArn: string
-    customDomainName: string
+    authSubdomain: string
+    rootDomain: string
 }
 
 export interface UserPoolClientProps {
@@ -85,7 +84,7 @@ export class GenericCognito extends Construct{
                     mutable: false,
                 },
                 givenName: {
-                    required: true,
+                    required: false,
                     mutable: false,
                 },
                 familyName: {
@@ -106,20 +105,20 @@ export class GenericCognito extends Construct{
 
         const userPoolDomain = this.userPool.addDomain('UserPoolCustomDomain', {
             customDomain: {
-                domainName: props.customDomainName,
+                domainName: [props.authSubdomain, props.rootDomain].join('.'),
                 certificate: cert,
             },
         })
 
-        // const hostedZone = HostedZone.fromLookup(this, 'HostedZone', {
-        //     domainName: props.rootDomain
-        // });
-        //
-        // new ARecord(this, props.ARecordId, {
-        //     zone: hostedZone,
-        //     recordName: props.subdomain,
-        //     target: RecordTarget.fromAlias(new UserPoolDomainTarget(userPoolDomain)),
-        // });
+        const hostedZone = HostedZone.fromLookup(this, 'HostedZone', {
+            domainName: props.rootDomain
+        })
+
+        new ARecord(this, 'authARecordId', {
+            zone: hostedZone,
+            recordName: props.authSubdomain,
+            target: RecordTarget.fromAlias(new aws_route53_targets.UserPoolDomainTarget(userPoolDomain)),
+        })
 
         new CfnOutput(this, 'UserPoolId', {
             value: this.userPool.userPoolId

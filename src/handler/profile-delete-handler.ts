@@ -8,7 +8,7 @@ import {ProfileService} from "../service/ProfileService";
 import {getEventBody, getPathParameter, getSub} from "../lib/utils";
 import {ProfileCreateParams, ProfileDeleteParams} from "../service/types";
 
-const table = Env.get('TODO_TABLE')
+const table = Env.get('PROFILE_TABLE')
 const todoService = new ProfileService({
     table: table
 })
@@ -25,10 +25,10 @@ export async function handler(event: APIGatewayProxyEvent, context: Context):
         body: 'Hello From Todo Edit Api!'
     }
     try {
-        const id = getPathParameter(event, 'id')
+        const accountId = getPathParameter(event, 'accountId')
         const sub = getSub(event)
         const todo = await todoService.delete({
-            id: id,
+            accountId: accountId,
             userId: sub,
         })
         result.body = JSON.stringify(todo)

@@ -8,7 +8,7 @@ import {Env} from "../lib/env";
 import {ProfileService} from "../service/ProfileService";
 import {ProfileEditParams} from "../service/types";
 
-const table = Env.get('TODO_TABLE')
+const table = Env.get('PROFILE_TABLE')
 const todoService = new ProfileService({
     table: table
 })
@@ -29,8 +29,8 @@ export async function handler(event: APIGatewayProxyEvent, context: Context):
         const item = getEventBody(event) as ProfileEditParams;
         const sub = getSub(event)
         item.userId = sub
-        const todo = await todoService.edit(item)
-        result.body = JSON.stringify(todo)
+        const profile = await todoService.edit(item)
+        result.body = JSON.stringify(profile)
     } catch (error) {
         result.statusCode = 500
         result.body = error.message
