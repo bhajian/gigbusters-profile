@@ -1,22 +1,22 @@
 import { DocumentClient, ScanInput } from 'aws-sdk/clients/dynamodb'
 import { v4 as uuidv4 } from 'uuid'
 import {ExternalError} from "../lib/error";
-import {TodoCreateParams, TodoDeleteParams, TodoEditParams, TodoEntity, TodoGetParams} from "./types";
+import {ProfileCreateParams, ProfileDeleteParams, ProfileEditParams, ProfileEntity, ProfileGetParams} from "./types";
 
-interface TodoServiceProps{
+interface ProfileServiceProps{
     table: string
 }
 
-export class TodoService {
+export class ProfileService {
 
-    private props: TodoServiceProps
+    private props: ProfileServiceProps
     private documentClient = new DocumentClient()
 
-    public constructor(props: TodoServiceProps){
+    public constructor(props: ProfileServiceProps){
         this.props = props
     }
 
-    async list(userId: string): Promise<TodoEntity[]> {
+    async list(userId: string): Promise<ProfileEntity[]> {
         const response = await this.documentClient
             .query({
                 TableName: this.props.table,
@@ -25,12 +25,12 @@ export class TodoService {
                 ExpressionAttributeValues : {':userId' : userId}
             }).promise()
         if (response.Items === undefined) {
-            return [] as TodoEntity[]
+            return [] as ProfileEntity[]
         }
-        return response.Items as TodoEntity[]
+        return response.Items as ProfileEntity[]
     }
 
-    async get(params: TodoGetParams): Promise<TodoEntity> {
+    async get(params: ProfileGetParams): Promise<ProfileEntity> {
         const response = await this.documentClient
             .get({
                 TableName: this.props.table,
@@ -40,13 +40,13 @@ export class TodoService {
             }).promise()
         if (response.Item === undefined ||
             response.Item.userId != params.userId) {
-            return {} as TodoEntity
+            return {} as ProfileEntity
         }
-        return response.Item as TodoEntity
+        return response.Item as ProfileEntity
     }
 
-    async create(params: TodoCreateParams): Promise<TodoEntity> {
-        const todo: TodoEntity = {
+    async create(params: ProfileCreateParams): Promise<ProfileEntity> {
+        const todo: ProfileEntity = {
             id: uuidv4(),
             ...params,
         }
@@ -58,7 +58,7 @@ export class TodoService {
         return todo
     }
 
-    async edit(params: TodoEditParams): Promise<TodoEntity> {
+    async edit(params: ProfileEditParams): Promise<ProfileEntity> {
         const response = await this.documentClient
             .put({
                 TableName: this.props.table,
@@ -69,7 +69,7 @@ export class TodoService {
         return params
     }
 
-    async delete(params: TodoDeleteParams) {
+    async delete(params: ProfileDeleteParams) {
         const response = await this.documentClient
             .delete({
                 TableName: this.props.table,

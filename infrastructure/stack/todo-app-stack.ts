@@ -17,7 +17,7 @@ export class TodoAppStack extends Stack {
   constructor(scope: Construct, id: string, todoAppProps: TodoAppProps,  props?: cdk.StackProps) {
     super(scope, id, props);
     this.todoApis = new ProfileApis(this,id, {
-      todoTable: todoAppProps.todoAppStatefulStack.profileTable,
+      profileTable: todoAppProps.todoAppStatefulStack.profileTable,
       cognito: todoAppProps.todoAppStatefulStack.cognito
     })
   }

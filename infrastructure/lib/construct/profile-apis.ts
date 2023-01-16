@@ -9,7 +9,7 @@ import {AuthorizationType} from "@aws-cdk/aws-apigateway";
 import config from "../../config/config";
 
 export interface ProfileApiProps {
-    todoTable: GenericDynamoTable
+    profileTable: GenericDynamoTable
     cognito: FameorbitCognito
 }
 
@@ -35,22 +35,22 @@ export class ProfileApis extends GenericApi {
 
     private initializeApis(props: ProfileApiProps){
         const authorizer = this.createAuthorizer({
-            id: 'todoUserAuthorizerId',
-            authorizerName: 'todoUserAuthorizer',
+            id: 'profileUserAuthorizerId',
+            authorizerName: 'profileUserAuthorizer',
             identitySource: 'method.request.header.Authorization',
             cognitoUserPools: [props.cognito.userPool]
         })
 
-        const todosApiResource = this.api.root.addResource('todos')
-        const todoIdResource = todosApiResource.addResource('{id}')
+        const profilesApiResource = this.api.root.addResource('profiles')
+        const profileAccountIdResource = profilesApiResource.addResource('{accountId}')
 
         this.listApi = this.addMethod({
-            functionName: 'todo-list',
-            handlerName: 'todo-list-handler.ts',
+            functionName: 'profile-list',
+            handlerName: 'profile-list-handler.ts',
             verb: 'GET',
-            resource: todosApiResource,
+            resource: profilesApiResource,
             environment: {
-                TODO_TABLE: props.todoTable.table.tableName
+                PROFILE_TABLE: props.profileTable.table.tableName
             },
             validateRequestBody: false,
             authorizationType: AuthorizationType.COGNITO,
@@ -58,12 +58,12 @@ export class ProfileApis extends GenericApi {
         })
 
         this.getApi = this.addMethod({
-            functionName: 'todo-get',
-            handlerName: 'todo-get-handler.ts',
+            functionName: 'profile-get',
+            handlerName: 'profile-get-handler.ts',
             verb: 'GET',
-            resource: todoIdResource,
+            resource: profileAccountIdResource,
             environment: {
-                TODO_TABLE: props.todoTable.table.tableName
+                PROFILE_TABLE: props.profileTable.table.tableName
             },
             validateRequestBody: false,
             authorizationType: AuthorizationType.COGNITO,
@@ -71,12 +71,12 @@ export class ProfileApis extends GenericApi {
         })
 
         this.createApi = this.addMethod({
-            functionName: 'todo-post',
-            handlerName: 'todo-create-handler.ts',
+            functionName: 'profile-post',
+            handlerName: 'profile-create-handler.ts',
             verb: 'POST',
-            resource: todosApiResource,
+            resource: profilesApiResource,
             environment: {
-                TODO_TABLE: props.todoTable.table.tableName
+                PROFILE_TABLE: props.profileTable.table.tableName
             },
             validateRequestBody: true,
             bodySchema: createProfileSchema,
@@ -85,12 +85,12 @@ export class ProfileApis extends GenericApi {
         })
 
         this.editApi = this.addMethod({
-            functionName: 'todo-put',
-            handlerName: 'todo-edit-handler.ts',
+            functionName: 'profile-put',
+            handlerName: 'profile-edit-handler.ts',
             verb: 'PUT',
-            resource: todosApiResource,
+            resource: profilesApiResource,
             environment: {
-                TODO_TABLE: props.todoTable.table.tableName
+                PROFILE_TABLE: props.profileTable.table.tableName
             },
             validateRequestBody: true,
             bodySchema: editProfileSchema,
@@ -99,23 +99,23 @@ export class ProfileApis extends GenericApi {
         })
 
         this.deleteApi = this.addMethod({
-            functionName: 'todo-delete',
-            handlerName: 'todo-delete-handler.ts',
+            functionName: 'profile-delete',
+            handlerName: 'profile-delete-handler.ts',
             verb: 'DELETE',
-            resource: todoIdResource,
+            resource: profileAccountIdResource,
             environment: {
-                TODO_TABLE: props.todoTable.table.tableName
+                PROFILE_TABLE: props.profileTable.table.tableName
             },
             validateRequestBody: false,
             authorizationType: AuthorizationType.COGNITO,
             authorizer: authorizer
         })
 
-        props.todoTable.table.grantFullAccess(this.listApi.grantPrincipal)
-        props.todoTable.table.grantFullAccess(this.getApi.grantPrincipal)
-        props.todoTable.table.grantFullAccess(this.createApi.grantPrincipal)
-        props.todoTable.table.grantFullAccess(this.editApi.grantPrincipal)
-        props.todoTable.table.grantFullAccess(this.deleteApi.grantPrincipal)
+        props.profileTable.table.grantFullAccess(this.listApi.grantPrincipal)
+        props.profileTable.table.grantFullAccess(this.getApi.grantPrincipal)
+        props.profileTable.table.grantFullAccess(this.createApi.grantPrincipal)
+        props.profileTable.table.grantFullAccess(this.editApi.grantPrincipal)
+        props.profileTable.table.grantFullAccess(this.deleteApi.grantPrincipal)
     }
 
     protected createAuthorizer(props: AuthorizerProps): CognitoUserPoolsAuthorizer{

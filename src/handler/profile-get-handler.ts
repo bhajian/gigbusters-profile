@@ -4,11 +4,11 @@ import {
     APIGatewayProxyEvent
 } from 'aws-lambda';
 import {Env} from "../lib/env";
-import {TodoService} from "../service/TodoService";
+import {ProfileService} from "../service/ProfileService";
 import {getPathParameter, getQueryString, getSub} from "../lib/utils";
 
 const table = Env.get('TODO_TABLE')
-const todoService = new TodoService({
+const todoService = new ProfileService({
     table: table
 })
 
@@ -24,8 +24,12 @@ export async function handler(event: APIGatewayProxyEvent, context: Context):
         },
         body: ''
     }
-    const userId = getSub(event)
-    const todo = await todoService.list(userId)
+    const id = getPathParameter(event, 'id')
+    const sub = getSub(event)
+    const todo = await todoService.get({
+        id: id,
+        userId: sub
+    })
 
     result.body = JSON.stringify(todo)
     return result

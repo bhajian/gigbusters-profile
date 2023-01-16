@@ -3,13 +3,12 @@ import {
     APIGatewayProxyResult,
     APIGatewayProxyEvent
 } from 'aws-lambda';
-import {getEventBody, getSub} from "../lib/utils";
 import {Env} from "../lib/env";
-import {TodoService} from "../service/TodoService";
-import {TodoEditParams} from "../service/types";
+import {ProfileService} from "../service/ProfileService";
+import {getPathParameter, getQueryString, getSub} from "../lib/utils";
 
 const table = Env.get('TODO_TABLE')
-const todoService = new TodoService({
+const todoService = new ProfileService({
     table: table
 })
 
@@ -23,17 +22,11 @@ export async function handler(event: APIGatewayProxyEvent, context: Context):
             'Access-Control-Allow-Headers': '*',
             'Access-Control-Allow-Methods': '*'
         },
-        body: 'Hello From Todo Edit Api!'
+        body: ''
     }
-    try {
-        const item = getEventBody(event) as TodoEditParams;
-        const sub = getSub(event)
-        item.userId = sub
-        const todo = await todoService.edit(item)
-        result.body = JSON.stringify(todo)
-    } catch (error) {
-        result.statusCode = 500
-        result.body = error.message
-    }
+    const userId = getSub(event)
+    const todo = await todoService.list(userId)
+
+    result.body = JSON.stringify(todo)
     return result
 }

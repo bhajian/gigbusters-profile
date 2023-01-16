@@ -1,30 +1,38 @@
-export interface TodoGetParams{
-    id: string
+export interface ProfileGetParams {
+    accountId: string
     userId: string
 }
-export interface TodoEntity{
-    id: string
+export interface ProfileEntity {
+    accountId: string
     userId: string
+    accountType: string
+    subscription: string
     name: string
-    description: string
-    reminderDate: string
-    reminderTime: string
-    email: string
-    phone: string
-    emailReminder: boolean
-    phoneReminder: boolean
+    lastName: string
+    bio: string
+    phone: {}
+    email: {}
+    address: {}
+    location: {}
+    photos: []
+    socialAccounts: []
+    interestedTopics: []
 }
-export interface TodoCreateParams{
+export interface ProfileCreateParams {
     userId: string
+    accountType: string
+    subscription: string
     name: string
-    description: string
-    reminderDate: string
-    reminderTime: string
-    email: string
-    phone: string
-    emailReminder: boolean
-    phoneReminder: boolean
+    lastName: string
+    bio: string
+    phone: {}
+    email: {}
+    address: {}
+    location: {}
+    photos: []
+    socialAccounts: []
+    interestedTopics: []
 }
 
-export type TodoEditParams = TodoEntity
-export type TodoDeleteParams = TodoGetParams
+export type ProfileEditParams = ProfileEntity
+export type ProfileDeleteParams = ProfileGetParams
