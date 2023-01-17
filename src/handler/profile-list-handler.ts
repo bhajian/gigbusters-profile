@@ -8,7 +8,7 @@ import {ProfileService} from "../service/ProfileService";
 import {getPathParameter, getQueryString, getSub} from "../lib/utils";
 
 const table = Env.get('PROFILE_TABLE')
-const todoService = new ProfileService({
+const profileService = new ProfileService({
     table: table
 })
 
@@ -26,9 +26,9 @@ export async function handler(event: APIGatewayProxyEvent, context: Context):
     }
     try{
         const userId = getSub(event)
-        const todo = await todoService.list(userId)
+        const profiles = await profileService.list(userId)
 
-        result.body = JSON.stringify(todo)
+        result.body = JSON.stringify(profiles)
         return result
     }
     catch (e) {

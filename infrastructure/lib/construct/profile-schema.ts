@@ -5,7 +5,7 @@ export const createProfileSchema = {
     required: [
         "accountType", "subscription", "name", "lastName", "bio",
         "phone", "email", "address", "location", "photos",
-        "socialAccounts", "interestedTopics"
+        "socialAccounts", "interestedCategories", "settings"
     ],
     properties: {
         accountType: {
@@ -106,10 +106,25 @@ export const createProfileSchema = {
                 }
             }
         },
-        interestedTopics: {
+        interestedCategories: {
             type: JsonSchemaType.ARRAY,
             items: {
                 type: JsonSchemaType.STRING
+            }
+        },
+        settings: {
+            type: JsonSchemaType.OBJECT,
+            required: ["country", "language", "notifications"],
+            properties: {
+                country: {
+                    type: JsonSchemaType.STRING,
+                },
+                language: {
+                    type: JsonSchemaType.STRING
+                },
+                notifications: {
+                    type: JsonSchemaType.BOOLEAN
+                },
             }
         }
     },
@@ -120,7 +135,7 @@ export const editProfileSchema = {
     required: [
         "accountId", "accountType", "subscription", "name", "lastName",
         "bio", "phone", "email", "address", "location", "photos",
-        "socialAccounts", "interestedTopics"
+        "socialAccounts", "interestedCategories", "settings"
     ],
     properties: {
         accountId: {
@@ -224,10 +239,25 @@ export const editProfileSchema = {
                 }
             }
         },
-        interestedTopics: {
+        interestedCategories: {
             type: JsonSchemaType.ARRAY,
             items: {
                 type: JsonSchemaType.STRING
+            }
+        },
+        settings: {
+            type: JsonSchemaType.OBJECT,
+            required: ["country", "language", "notifications"],
+            properties: {
+                country: {
+                    type: JsonSchemaType.STRING,
+                },
+                language: {
+                    type: JsonSchemaType.STRING
+                },
+                notifications: {
+                    type: JsonSchemaType.BOOLEAN
+                },
             }
         }
     },
