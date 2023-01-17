@@ -23,7 +23,7 @@ export class FameorbitCognito extends GenericCognito {
     public initializeCognito(){
         this.createUserPool({
             id: 'FameorbitUserPoolId',
-            userPoolName: 'FameorbitUserPool-' + this.suffixId,
+            userPoolName: `Fameorbit-UserPool-${config.envName}-${this.suffixId}`,
             selfSignUpEnabled: true,
             emailSignInAliases: true,
             userNameSignInAliases: true,

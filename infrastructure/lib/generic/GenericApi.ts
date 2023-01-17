@@ -85,13 +85,13 @@ export abstract class GenericApi extends Construct {
 
         new ARecord(this, props.ARecordId, {
             zone: hostedZone,
-            recordName: props.apiSubdomain,
+            recordName: [props.apiSubdomain, props.envName].join('.'),
             target: RecordTarget.fromAlias(new ApiGateway(this.api)),
         })
     }
 
     protected addMethod(props: Methodprops): NodejsFunction{
-        const apiId = `${props.functionName}-${config.envName}`
+        const apiId = `${config.envName}-${props.functionName}`
         let options: any = {}
 
         if(props.authorizationType && props.authorizer){

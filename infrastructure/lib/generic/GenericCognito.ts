@@ -13,6 +13,7 @@ import {FederatedPrincipal, Role} from "aws-cdk-lib/aws-iam";
 import {PolicyStatement} from "aws-cdk-lib/aws-iam/lib/policy-statement";
 import {Certificate} from "aws-cdk-lib/aws-certificatemanager";
 import {ARecord, HostedZone, RecordTarget} from "aws-cdk-lib/aws-route53";
+import {UserPoolDomainTarget} from "aws-cdk-lib/aws-route53-targets";
 
 export interface UserPoolProps {
     id: string
@@ -117,8 +118,8 @@ export class GenericCognito extends Construct{
 
         new ARecord(this, 'authARecordId', {
             zone: hostedZone,
-            recordName: props.authSubdomain,
-            target: RecordTarget.fromAlias(new aws_route53_targets.UserPoolDomainTarget(userPoolDomain)),
+            recordName: [props.authSubdomain, props.envName].join('.'),
+            target: RecordTarget.fromAlias(new UserPoolDomainTarget(userPoolDomain)),
         })
 
         new CfnOutput(this, 'UserPoolId', {
