@@ -24,6 +24,7 @@ export interface UserPoolProps {
     certificateArn: string
     authSubdomain: string
     rootDomain: string
+    envName: string
 }
 
 export interface UserPoolClientProps {
@@ -105,7 +106,7 @@ export class GenericCognito extends Construct{
 
         const userPoolDomain = this.userPool.addDomain('UserPoolCustomDomain', {
             customDomain: {
-                domainName: [props.authSubdomain, props.rootDomain].join('.'),
+                domainName: [props.authSubdomain, props.envName, props.rootDomain].join('.'),
                 certificate: cert,
             },
         })

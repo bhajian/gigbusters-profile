@@ -32,6 +32,15 @@ export interface Methodprops {
     authorizer?: Authorizer
 }
 
+export interface DomainNameProps {
+    certificateArn: string
+    apiSubdomain: string
+    domainNameId: string
+    rootDomain: string
+    ARecordId: string
+    basePath: string
+    envName: string
+}
 export interface AuthorizerProps {
     id: string
     authorizerName: string
@@ -57,13 +66,13 @@ export abstract class GenericApi extends Construct {
             }})
     }
 
-    protected initializeDomainName(props: any){
+    protected initializeDomainName(props: DomainNameProps){
         const cert = Certificate.fromCertificateArn(this,
             'certificateId',
-            props.certificateArn);
+            props.certificateArn)
 
         this.api.addDomainName(props.domainNameId, {
-            domainName: [props.subdomain, props.rootDomain].join('.'),
+            domainName: [props.apiSubdomain, props.envName, props.rootDomain].join('.'),
             certificate: cert,
             basePath: props.basePath
         })
@@ -72,16 +81,17 @@ export abstract class GenericApi extends Construct {
 
         const hostedZone = HostedZone.fromLookup(this, 'HostedZone', {
             domainName: props.rootDomain
-        });
+        })
+
         new ARecord(this, props.ARecordId, {
             zone: hostedZone,
-            recordName: props.subdomain,
+            recordName: props.apiSubdomain,
             target: RecordTarget.fromAlias(new ApiGateway(this.api)),
-        });
+        })
     }
 
     protected addMethod(props: Methodprops): NodejsFunction{
-        const apiId = config.account + '-' + config.env + '-' + props.functionName
+        const apiId = `${props.functionName}-${config.envName}`
         let options: any = {}
 
         if(props.authorizationType && props.authorizer){

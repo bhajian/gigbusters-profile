@@ -30,7 +30,8 @@ export class FameorbitCognito extends GenericCognito {
             phoneSignInAliases: false,
             certificateArn: config.authDomainCertificateArn,
             authSubdomain: config.authSubdomain,
-            rootDomain: config.rootDomain
+            rootDomain: config.rootDomain,
+            envName: config.envName
         })
 
         this.createUserPoolClient({

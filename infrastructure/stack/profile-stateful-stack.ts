@@ -6,6 +6,9 @@ import {Effect, PolicyStatement} from "aws-cdk-lib/aws-iam";
 import {GenericDynamoTable} from "../lib/generic/GenericDynamoTable";
 import {FameorbitCognito} from "../lib/construct/fameorbit-cognito";
 import {AttributeType, StreamViewType} from "aws-cdk-lib/aws-dynamodb";
+import {ARecord, HostedZone, RecordTarget} from "aws-cdk-lib/aws-route53";
+import {ApiGateway} from "aws-cdk-lib/aws-route53-targets";
+import config from "../config/config";
 
 
 export class ProfileStatefulStack extends Stack {
@@ -18,10 +21,25 @@ export class ProfileStatefulStack extends Stack {
     constructor(scope: Construct, id: string, props?: cdk.StackProps) {
         super(scope, id, props);
         this.initializeSuffix()
+        this.initializeARecord()
         this.initializeTodosPhotosBucket()
-        this.initializeTodosTable()
+        this.initializeDynamodbTable()
         this.initializeBucketPolicies()
         this.initializeCognito()
+
+
+    }
+
+    private initializeARecord() {
+        const hostedZone = HostedZone.fromLookup(this, 'HostedZone', {
+            domainName: config.rootDomain
+        })
+
+        new ARecord(this, 'DummyARecordId', {
+            zone: hostedZone,
+            recordName: `${config.envName}.${config.rootDomain}`,
+            target: RecordTarget.fromIpAddresses('1.1.1.1')
+        })
     }
 
     private initializeSuffix() {
@@ -30,9 +48,9 @@ export class ProfileStatefulStack extends Stack {
         this.suffix = Suffix;
     }
 
-    private initializeTodosTable() {
+    private initializeDynamodbTable() {
         this.profileTable = new GenericDynamoTable(this, 'ProfileDynamoDBTable', {
-            tableName: 'Profile-' + this.suffix,
+            tableName: `Profile-${config.envName}-${this.suffix}` ,
             primaryKey: 'accountId',
             stream: StreamViewType.NEW_AND_OLD_IMAGES,
             keyType: AttributeType.STRING
@@ -47,7 +65,7 @@ export class ProfileStatefulStack extends Stack {
     private initializeTodosPhotosBucket() {
         this.profilePhotoBucket = new Bucket(this, 'profile-photos', {
             removalPolicy: RemovalPolicy.DESTROY,
-            bucketName: 'profile-photos-' + this.suffix,
+            bucketName: `profile-photos-${config.envName}-${this.suffix}`,
             cors: [{
                 allowedMethods: [
                     HttpMethods.HEAD,

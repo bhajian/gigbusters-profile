@@ -1,7 +1,7 @@
 
 const configFile = require('./dev.json')
 interface Env {
-    env: string | undefined
+    envName: string | undefined
     account: string | undefined
     region: string | undefined
     apiDomainCertificateArn: string | undefined
@@ -13,7 +13,7 @@ interface Env {
 }
 
 interface AppConfig {
-    env: string
+    envName: string
     account: string
     region: string
     apiDomainCertificateArn: string
@@ -26,7 +26,7 @@ interface AppConfig {
 
 const getConfig = (): Env => {
     return {
-        env: configFile.envName ? configFile.envName : 'dev' ,
+        envName: configFile.envName ? configFile.envName : 'dev' ,
         account: configFile.account ? configFile.account : 'dev' ,
         region: configFile.region ? configFile.region : 'us-east-1' ,
         apiDomainCertificateArn: configFile.apiDomainCertificateArn,

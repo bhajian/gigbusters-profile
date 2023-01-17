@@ -2,10 +2,10 @@
   "envName": "behnam",
   "account": "341450653870",
   "region": "us-east-1",
-  "apiDomainCertificateArn": "arn:aws:acm:us-east-1:341450653870:certificate/ced0151d-9c0c-4c28-8ca6-6ea5f774f9ae",
+  "apiDomainCertificateArn": "arn:aws:acm:us-east-1:341450653870:certificate/b1050261-e3c5-42db-9b8b-7b8071da635a",
   "rootDomain": "fameorbit.com",
   "apiSubdomain": "api",
-  "authDomainCertificateArn": "arn:aws:acm:us-east-1:341450653870:certificate/8da26db8-f768-4e63-aad1-67218ce5108a",
+  "authDomainCertificateArn": "arn:aws:acm:us-east-1:341450653870:certificate/a40d17d0-a2d3-4a4c-bb07-101868caeeb2",
   "authSubdomain": "auth",
   "basePath": "profile"
 }

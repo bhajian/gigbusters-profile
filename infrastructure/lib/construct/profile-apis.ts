@@ -55,11 +55,12 @@ export class ProfileApis extends GenericApi {
         this.initializeApis(props);
         this.initializeDomainName({
             certificateArn: config.apiDomainCertificateArn,
-            subdomain: config.apiSubdomain,
+            apiSubdomain: config.apiSubdomain,
             domainNameId: 'domainNameId',
             rootDomain: config.rootDomain,
             ARecordId: 'ARecordId',
             basePath: config.basePath,
+            envName: config.envName
         })
     }
 
