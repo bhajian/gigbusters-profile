@@ -83,7 +83,7 @@ export const createProfileSchema = {
         photos: {
             type: JsonSchemaType.ARRAY,
             items: {
-                type: JsonSchemaType.STRING
+                type: JsonSchemaType.OBJECT
             }
         },
         socialAccounts: {
@@ -216,7 +216,7 @@ export const editProfileSchema = {
         photos: {
             type: JsonSchemaType.ARRAY,
             items: {
-                type: JsonSchemaType.STRING
+                type: JsonSchemaType.OBJECT
             }
         },
         socialAccounts: {

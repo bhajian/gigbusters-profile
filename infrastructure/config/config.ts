@@ -26,7 +26,7 @@ interface AppConfig {
 
 const getConfig = (): Env => {
     return {
-        env: configFile.envNameenv ? configFile.envNameenv : 'dev' ,
+        env: configFile.envName ? configFile.envName : 'dev' ,
         account: configFile.account ? configFile.account : 'dev' ,
         region: configFile.region ? configFile.region : 'us-east-1' ,
         apiDomainCertificateArn: configFile.apiDomainCertificateArn,

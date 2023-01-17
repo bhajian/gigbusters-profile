@@ -33,7 +33,7 @@ export class GenericDynamoTable extends Construct {
                 type: AttributeType.STRING
             },
             stream: props.stream,
-            tableName: config.account + '-' + config.env + '-' + this.props.tableName
+            tableName: `this.props.tableName-${config.env}`
         })
     }
 
