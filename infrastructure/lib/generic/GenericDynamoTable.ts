@@ -9,12 +9,16 @@ export interface GenericTableProps {
     primaryKey: string
     keyType: AttributeType
     stream?: StreamViewType
+    sortKeyName?: string
+    sortKeyType?: AttributeType
 }
 
 export interface SecondaryIndexProp {
     indexName: string
     partitionKeyName: string
-    keyType: AttributeType
+    partitionKeyType: AttributeType
+    sortKeyName?: string
+    sortKeyType?: AttributeType
 }
 
 export class GenericDynamoTable extends Construct {
@@ -33,20 +37,26 @@ export class GenericDynamoTable extends Construct {
                 type: AttributeType.STRING
             },
             stream: props.stream,
-            tableName: this.props.tableName
+            tableName: this.props.tableName,
+            sortKey: (props.sortKeyName && props.sortKeyType)? {
+                name: props.sortKeyName,
+                type: props.sortKeyType,
+            } : undefined
         })
     }
 
-    public addSecondaryIndexes(options: SecondaryIndexProp){
-        if (options) {
-            this.table.addGlobalSecondaryIndex({
-                indexName: options.indexName,
-                partitionKey: {
-                    name: options.partitionKeyName,
-                    type: options.keyType
-                }
-            })
-        }
+    public addSecondaryIndexes(props: SecondaryIndexProp){
+        this.table.addGlobalSecondaryIndex({
+            indexName: props.indexName,
+            partitionKey: {
+                name: props.partitionKeyName,
+                type: props.partitionKeyType
+            },
+            sortKey: (props.sortKeyName && props.sortKeyType)? {
+                name: props.sortKeyName,
+                type: props.sortKeyType,
+            } : undefined
+        })
     }
 
 }

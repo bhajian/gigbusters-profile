@@ -3,24 +3,21 @@ import { Construct } from 'constructs';
 import {Stack} from "aws-cdk-lib";
 import {ProfileApis} from "../lib/construct/profile-apis";
 import {ProfileStatefulStack} from "./profile-stateful-stack";
-import {FameorbitCognito} from "../lib/construct/fameorbit-cognito";
 
-
-export interface TodoAppProps{
-  todoAppStatefulStack: ProfileStatefulStack
+export interface ProfileAppProps {
+  profileStatefulStack: ProfileStatefulStack
 }
 
 export class ProfileApiStack extends Stack {
 
-  public todoApis:ProfileApis
+  public profileApis:ProfileApis
 
-  constructor(scope: Construct, id: string, todoAppProps: TodoAppProps,  props?: cdk.StackProps) {
+  constructor(scope: Construct, id: string, todoAppProps: ProfileAppProps, props?: cdk.StackProps) {
     super(scope, id, props);
-    this.todoApis = new ProfileApis(this,id, {
-      profileTable: todoAppProps.todoAppStatefulStack.profileTable,
-      cognito: todoAppProps.todoAppStatefulStack.cognito
+    this.profileApis = new ProfileApis(this,id, {
+      profileTable: todoAppProps.profileStatefulStack.table,
+      cognito: todoAppProps.profileStatefulStack.cognito
     })
   }
-
 
 }

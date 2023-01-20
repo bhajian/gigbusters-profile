@@ -4,7 +4,7 @@ import {
     APIGatewayProxyEvent
 } from 'aws-lambda';
 import {Env} from "../lib/env";
-import {ProfileService} from "../service/ProfileService";
+import {ProfileService} from "../service/profile-service";
 import {getEventBody, getPathParameter, getSub} from "../lib/utils";
 import {ProfileCreateParams, ProfileDeleteParams} from "../service/types";
 

@@ -48,7 +48,7 @@ export class ProfileApis extends GenericApi {
     private listCategoryApi: NodejsFunction
 
     private validateApi: NodejsFunction
-
+    private requestValidationApi: NodejsFunction
 
     public constructor(scope: Construct, id: string, props: ProfileApiProps) {
         super(scope, id)
@@ -85,7 +85,36 @@ export class ProfileApis extends GenericApi {
             rootResource: this.api.root,
             table: props.profileTable.table
         })
-
+        this.initializeLocationApis({
+            authorizer: authorizer,
+            idResource: profileAccountIdResource,
+            rootResource: this.api.root,
+            table: props.profileTable.table
+        })
+        this.initializeSettingsApis({
+            authorizer: authorizer,
+            idResource: profileAccountIdResource,
+            rootResource: this.api.root,
+            table: props.profileTable.table
+        })
+        this.initializeProfileCategoryApis({
+            authorizer: authorizer,
+            idResource: profileAccountIdResource,
+            rootResource: this.api.root,
+            table: props.profileTable.table
+        })
+        this.initializeSocialAccountsApis({
+            authorizer: authorizer,
+            idResource: profileAccountIdResource,
+            rootResource: this.api.root,
+            table: props.profileTable.table
+        })
+        this.initializeValidateApis({
+            authorizer: authorizer,
+            idResource: profileAccountIdResource,
+            rootResource: this.api.root,
+            table: props.profileTable.table
+        })
     }
 
     private initializeProfileMainApis(props: ApiProps){
@@ -165,7 +194,7 @@ export class ProfileApis extends GenericApi {
 
     private initializeProfilePhotoApis(props: ApiProps){
         const photoResource = props.idResource.addResource('photo')
-        const photoIdResource = props.idResource.addResource('{photoId}')
+        const photoIdResource = photoResource.addResource('{photoId}')
 
         this.listPhotosApi = this.addMethod({
             functionName: 'profile-photo-list',
@@ -262,8 +291,8 @@ export class ProfileApis extends GenericApi {
         const settingsResource = props.idResource.addResource('setting')
 
         this.setSettingApi = this.addMethod({
-            functionName: 'profile-settings-set',
-            handlerName: 'profile-settings-set-handler.ts',
+            functionName: 'profile-setting-set',
+            handlerName: 'profile-setting-set-handler.ts',
             verb: 'PUT',
             resource: settingsResource,
             environment: {
@@ -275,8 +304,8 @@ export class ProfileApis extends GenericApi {
         })
 
         this.getSettingApi = this.addMethod({
-            functionName: 'profile-settings-get',
-            handlerName: 'profile-settings-get-handler.ts',
+            functionName: 'profile-setting-get',
+            handlerName: 'profile-setting-get-handler.ts',
             verb: 'GET',
             resource: settingsResource,
             environment: {
@@ -291,9 +320,9 @@ export class ProfileApis extends GenericApi {
         props.table.grantFullAccess(this.getSettingApi.grantPrincipal)
     }
 
-    private initializeCategoriesApis(props: ApiProps){
+    private initializeProfileCategoryApis(props: ApiProps){
         const categoryResource = props.idResource.addResource('category')
-        const categoryIdResource = props.idResource.addResource('{categoryId}')
+        const categoryIdResource = categoryResource.addResource('{categoryId}')
 
         this.listCategoryApi = this.addMethod({
             functionName: 'profile-category-list',
@@ -339,9 +368,9 @@ export class ProfileApis extends GenericApi {
         props.table.grantFullAccess(this.deleteCategoryApi.grantPrincipal)
     }
 
-    private initializeSocialsApis(props: ApiProps){
+    private initializeSocialAccountsApis(props: ApiProps){
         const socialResource = props.idResource.addResource('social')
-        const socialIdResource = props.idResource.addResource('{socialId}')
+        const socialIdResource = socialResource.addResource('{socialId}')
 
         this.listSocialApi = this.addMethod({
             functionName: 'profile-social-list',
@@ -389,12 +418,25 @@ export class ProfileApis extends GenericApi {
 
     private initializeValidateApis(props: ApiProps){
         const validateResource = props.idResource.addResource('validate')
+        const requestValidationResource = props.idResource.addResource('requestValidation')
 
         this.validateApi = this.addMethod({
             functionName: 'profile-validate',
             handlerName: 'profile-validate-handler.ts',
             verb: 'POST',
             resource: validateResource,
+            environment: {
+                PROFILE_TABLE: props.table.tableName
+            },
+            validateRequestBody: false,
+            authorizationType: AuthorizationType.COGNITO,
+            authorizer: props.authorizer
+        })
+        this.requestValidationApi = this.addMethod({
+            functionName: 'profile-request-validation',
+            handlerName: 'profile-request-validation-handler.ts',
+            verb: 'POST',
+            resource: requestValidationResource,
             environment: {
                 PROFILE_TABLE: props.table.tableName
             },

@@ -5,7 +5,7 @@ import {
 } from 'aws-lambda';
 import {getEventBody, getSub} from "../lib/utils";
 import {Env} from "../lib/env";
-import {ProfileService} from "../service/ProfileService";
+import {ProfileService} from "../service/profile-service";
 import {ProfileEditParams} from "../service/types";
 
 const table = Env.get('PROFILE_TABLE')

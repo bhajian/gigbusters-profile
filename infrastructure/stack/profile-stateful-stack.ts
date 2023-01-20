@@ -7,12 +7,11 @@ import {GenericDynamoTable} from "../lib/generic/GenericDynamoTable";
 import {FameorbitCognito} from "../lib/construct/fameorbit-cognito";
 import {AttributeType, StreamViewType} from "aws-cdk-lib/aws-dynamodb";
 import {ARecord, HostedZone, RecordTarget} from "aws-cdk-lib/aws-route53";
-import {ApiGateway} from "aws-cdk-lib/aws-route53-targets";
 import config from "../config/config";
 
 
 export class ProfileStatefulStack extends Stack {
-    public profileTable: GenericDynamoTable
+    public table: GenericDynamoTable
     public profilePhotoBucket: Bucket
     public uploadProfilePhotosPolicy: PolicyStatement
     public cognito: FameorbitCognito
@@ -22,7 +21,7 @@ export class ProfileStatefulStack extends Stack {
         super(scope, id, props);
         this.initializeSuffix()
         this.initializeARecord()
-        this.initializeTodosPhotosBucket()
+        this.initializeProfilePhotosBucket()
         this.initializeDynamodbTable()
         this.initializeBucketPolicies()
         this.initializeCognito()
@@ -49,20 +48,20 @@ export class ProfileStatefulStack extends Stack {
     }
 
     private initializeDynamodbTable() {
-        this.profileTable = new GenericDynamoTable(this, 'ProfileDynamoDBTable', {
+        this.table = new GenericDynamoTable(this, 'ProfileDynamoDBTable', {
             tableName: `Profile-${config.envName}-${this.suffix}` ,
             primaryKey: 'accountId',
             stream: StreamViewType.NEW_AND_OLD_IMAGES,
             keyType: AttributeType.STRING
         })
-        this.profileTable.addSecondaryIndexes({
+        this.table.addSecondaryIndexes({
             indexName: 'userIdIndex',
             partitionKeyName: 'userId',
-            keyType: AttributeType.STRING
+            partitionKeyType: AttributeType.STRING
         })
     }
 
-    private initializeTodosPhotosBucket() {
+    private initializeProfilePhotosBucket() {
         this.profilePhotoBucket = new Bucket(this, 'profile-photos', {
             removalPolicy: RemovalPolicy.DESTROY,
             bucketName: `profile-photos-${config.envName}-${this.suffix}`,

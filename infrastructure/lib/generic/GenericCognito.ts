@@ -181,7 +181,10 @@ export class GenericCognito extends Construct{
                 },
                 'sts:AssumeRoleWithWebIdentity'
             )
-        });
+        })
+        new CfnOutput(this, 'cognito-identitypool-authenticated-role-arn', {
+            value: this.authenticatedRole.roleArn
+        })
 
         this.unAuthenticatedRole = new Role(this, 'CognitoDefaultUnAuthenticatedRole', {
             assumedBy: new FederatedPrincipal('cognito-identity.amazonaws.com', {
@@ -194,7 +197,10 @@ export class GenericCognito extends Construct{
                 },
                 'sts:AssumeRoleWithWebIdentity'
             )
-        });
+        })
+        new CfnOutput(this, 'cognito-identitypool-unauthenticated-role-arn', {
+            value: this.unAuthenticatedRole.roleArn
+        })
 
         this.adminRole = new Role(this, 'CognitoAdminRole', {
             assumedBy: new FederatedPrincipal('cognito-identity.amazonaws.com', {
@@ -208,6 +214,10 @@ export class GenericCognito extends Construct{
                 'sts:AssumeRoleWithWebIdentity'
             )
         })
+        new CfnOutput(this, 'cognito-identitypool-admin-role-arn', {
+            value: this.adminRole.roleArn
+        })
+
     }
 
     protected attachRoles(){
