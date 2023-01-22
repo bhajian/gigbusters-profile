@@ -3,13 +3,15 @@ import { v4 as uuidv4 } from 'uuid'
 import {ExternalError} from "../lib/error";
 import {
     LocationEntry,
-    PhotoDeletetParams,
-    PhotoEntry, PhotoGetParams,
+    PhotoEntry,
+    PhotoParams,
+    SocialParams,
+    CategoryParams,
     ProfileCreateParams,
-    ProfileDeleteParams,
-    ProfileEditParams,
     ProfileEntity,
-    ProfileGetParams
+    SettingEntry,
+    SocialAccount,
+    ProfileParams
 } from "./types";
 
 interface ProfileServiceProps{
@@ -39,7 +41,7 @@ export class ProfileService {
         return response.Items as ProfileEntity[]
     }
 
-    async getProfile(params: ProfileGetParams): Promise<ProfileEntity> {
+    async getProfile(params: ProfileParams): Promise<ProfileEntity> {
         const response = await this.documentClient
             .get({
                 TableName: this.props.table,
@@ -78,7 +80,7 @@ export class ProfileService {
         return profile
     }
 
-    async editProfile(params: ProfileEditParams): Promise<ProfileEntity> {
+    async editProfile(params: ProfileEntity): Promise<ProfileEntity> {
         const response = await this.documentClient
             .put({
                 TableName: this.props.table,
@@ -89,7 +91,7 @@ export class ProfileService {
         return params
     }
 
-    async deleteProfile(params: ProfileDeleteParams) {
+    async deleteProfile(params: ProfileParams) {
         const response = await this.documentClient
             .delete({
                 TableName: this.props.table,
@@ -101,7 +103,7 @@ export class ProfileService {
             }).promise()
     }
 
-    async deactivateProfile(params: ProfileDeleteParams) {
+    async deactivateProfile(params: ProfileParams) {
         const response = await this.documentClient
             .update({
                 TableName: this.props.table,
@@ -117,7 +119,7 @@ export class ProfileService {
             }).promise()
     }
 
-    async listPhotos(params: ProfileGetParams): Promise<string[]> {
+    async listPhotos(params: ProfileParams): Promise<string[]> {
         const response = await this.documentClient
             .get({
                 TableName: this.props.table,
@@ -133,7 +135,7 @@ export class ProfileService {
         return response.Item.photos as string[]
     }
 
-    async getPhoto(params: PhotoGetParams): Promise<PhotoEntry | {}> {
+    async getPhoto(params: PhotoParams): Promise<PhotoEntry | {}> {
         const response = await this.documentClient
             .get({
                 TableName: this.props.table,
@@ -152,7 +154,7 @@ export class ProfileService {
         return {}
     }
 
-    async addPhoto(params: ProfileGetParams): Promise<PhotoEntry> {
+    async addPhoto(params: ProfileParams): Promise<PhotoEntry> {
         const newPhoto = {
             photoId: uuidv4(),
         }
@@ -180,11 +182,10 @@ export class ProfileService {
             throw new Error('The profile was not found for this accountId' +
                 ' or the user did not match the profile owner.')
         }
-
         return newPhoto
     }
 
-    async deletePhoto(params: PhotoDeletetParams) {
+    async deletePhoto(params: PhotoParams) {
         const response = await this.documentClient
             .get({
                 TableName: this.props.table,
@@ -207,7 +208,7 @@ export class ProfileService {
         }
     }
 
-    async setLocation(getParams: ProfileGetParams, location: LocationEntry):
+    async setLocation(getParams: ProfileParams, location: LocationEntry):
         Promise<any> {
         const response = await this.documentClient
             .update({
@@ -230,7 +231,7 @@ export class ProfileService {
         return
     }
 
-    async getLocation(params: ProfileGetParams): Promise<LocationEntry | {}> {
+    async getLocation(params: ProfileParams): Promise<LocationEntry | {}> {
         const response = await this.documentClient
             .get({
                 TableName: this.props.table,
@@ -245,44 +246,173 @@ export class ProfileService {
         return {}
     }
 
-    async setSetting(params: ProfileGetParams): Promise<any> {
-
+    async setSetting(getParams: ProfileParams, setting: SettingEntry):
+        Promise<any> {
+        const response = await this.documentClient
+            .update({
+                TableName: this.props.table,
+                Key: {
+                    accountId: getParams.accountId,
+                },
+                ConditionExpression: 'userId = :userId',
+                UpdateExpression: 'set #set.notifications=:notifications, ' +
+                    '#set.language=:language, ' +
+                    '#set.country=:country',
+                ExpressionAttributeNames: {
+                    '#set': 'settings',
+                },
+                ExpressionAttributeValues: {
+                    ':userId' : getParams.userId,
+                    ':country': setting.country,
+                    ':language': setting.language,
+                    ':notifications': setting.notifications,
+                }
+            }).promise()
         return
     }
 
-    async getSetting(params: ProfileGetParams): Promise<any> {
+    async getSetting(params: ProfileParams): Promise<any> {
+        const response = await this.documentClient
+            .get({
+                TableName: this.props.table,
+                Key: {
+                    accountId: params.accountId,
+                },
+            }).promise()
+        const profile = response.Item
+        if (profile && profile.settings && profile.userId === params.userId) {
+            return profile.settings
+        }
+        return {}
+    }
 
+    async addSocial(params: ProfileParams, socialParams: SocialAccount): Promise<any> {
+        const newSocialAccount: SocialAccount = {
+            socialId: uuidv4(),
+            ...socialParams
+        }
+        const response = await this.documentClient
+            .get({
+                TableName: this.props.table,
+                Key: {
+                    accountId: params.accountId,
+                },
+            }).promise()
+        if (response.Item && response.Item.userId === params.userId) {
+            if(response.Item.socialAccounts){
+                response.Item.socialAccounts.push(newSocialAccount)
+            } else{
+                response.Item.socialAccounts = [newSocialAccount]
+            }
+            await this.documentClient
+                .put({
+                    TableName: this.props.table,
+                    Item: response.Item,
+                    ConditionExpression: 'userId = :userId',
+                    ExpressionAttributeValues : {':userId' : params.userId}
+                }).promise()
+        } else{
+            throw new Error('The profile was not found for this accountId' +
+                ' or the user did not match the profile owner.')
+        }
+        return newSocialAccount
+    }
+
+    async deleteSocial(params: SocialParams): Promise<any> {
+        const response = await this.documentClient
+            .get({
+                TableName: this.props.table,
+                Key: {
+                    accountId: params.accountId,
+                },
+            }).promise()
+        const profile = response.Item
+        if (profile && profile.socialAccounts && profile.userId === params.userId) {
+            const socialsWithoutItem = profile.socialAccounts
+                .filter((item: SocialAccount) => item.socialId != params.socialId)
+            profile.socialAccounts = socialsWithoutItem
+            await this.documentClient
+                .put({
+                    TableName: this.props.table,
+                    Item: profile,
+                    ConditionExpression: 'userId = :userId',
+                    ExpressionAttributeValues : {':userId' : params.userId}
+                }).promise()
+        }
         return
     }
 
-    async addSocial(params: ProfileGetParams): Promise<any> {
+    async listSocial(params: ProfileParams): Promise<any> {
+        const response = await this.documentClient
+            .get({
+                TableName: this.props.table,
+                Key: {
+                    accountId: params.accountId,
+                },
+            }).promise()
+        if (response.Item === undefined ||
+            response.Item.socialAccounts === undefined ||
+            response.Item.userId != params.userId) {
+            return []
+        }
+        return response.Item.socialAccounts as SocialAccount[]
+    }
 
+    async addCategory(params: CategoryParams): Promise<any> {
+        const response = await this.documentClient
+            .update({
+                TableName: this.props.table,
+                Key: {
+                    accountId: params.accountId,
+                },
+                ConditionExpression: 'userId = :userId ',
+                UpdateExpression: 'ADD #ic :ic ',
+                ExpressionAttributeNames: {
+                    '#ic': 'interestedCategories',
+                },
+                ExpressionAttributeValues: {
+                    ':userId' : params.userId,
+                    ':ic': this.documentClient.createSet([params.category]),
+                }
+            }).promise()
         return
     }
 
-    async deleteSocial(params: ProfileGetParams): Promise<any> {
-
+    async deleteCategory(params: CategoryParams): Promise<any> {
+        const response = await this.documentClient
+            .update({
+                TableName: this.props.table,
+                Key: {
+                    accountId: params.accountId,
+                },
+                ConditionExpression: 'userId = :userId ',
+                UpdateExpression: 'DELETE #ic :ic ',
+                ExpressionAttributeNames: {
+                    '#ic': 'interestedCategories',
+                },
+                ExpressionAttributeValues: {
+                    ':userId' : params.userId,
+                    ':ic': this.documentClient.createSet([params.category]),
+                }
+            }).promise()
+        return
         return
     }
 
-    async listSocial(params: ProfileGetParams): Promise<any> {
-
-        return
-    }
-
-    async addCategory(params: ProfileGetParams): Promise<any> {
-
-        return
-    }
-
-    async deleteCategory(params: ProfileGetParams): Promise<any> {
-
-        return
-    }
-
-    async listCategory(params: ProfileGetParams): Promise<any> {
-
-        return
+    async listCategory(params: ProfileParams): Promise<any> {
+        const response = await this.documentClient
+            .get({
+                TableName: this.props.table,
+                Key: {
+                    accountId: params.accountId,
+                },
+            }).promise()
+        if (response.Item === undefined ||
+            response.Item.interestedCategories === undefined ||
+            response.Item.userId != params.userId) {
+            return [] as string[]
+        }
+        return response.Item.interestedCategories as string[]
     }
 
 }

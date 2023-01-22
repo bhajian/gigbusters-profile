@@ -27,12 +27,14 @@ export async function handler(event: APIGatewayProxyEvent, context: Context):
     try {
         const accountId = getPathParameter(event, 'accountId')
         const sub = getSub(event)
+        const body = getEventBody(event)
 
-        const newPhoto = await profileService.addPhoto({
+        await profileService.addCategory({
             accountId: accountId,
             userId: sub,
+            category: body.category
         })
-        result.body = JSON.stringify(newPhoto)
+        result.body = JSON.stringify({success: true})
     } catch (error) {
         result.statusCode = 500
         result.body = error.message

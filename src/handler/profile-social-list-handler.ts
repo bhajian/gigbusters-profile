@@ -27,12 +27,12 @@ export async function handler(event: APIGatewayProxyEvent, context: Context):
     try{
         const userId = getSub(event)
         const accountId = getPathParameter(event, 'accountId')
-        const photos = await profileService.listPhotos({
+        const items = await profileService.listSocial({
             accountId: accountId,
             userId: userId
         })
 
-        result.body = JSON.stringify(photos)
+        result.body = JSON.stringify(items)
         return result
     }
     catch (e) {

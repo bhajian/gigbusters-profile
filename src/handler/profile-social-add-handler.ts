@@ -6,7 +6,7 @@ import {
 import {getEventBody, getPathParameter, getSub} from "../lib/utils";
 import {Env} from "../lib/env";
 import {ProfileService} from "../service/profile-service";
-import {ProfileCreateParams} from "../service/types";
+import {ProfileCreateParams, SocialAccount} from "../service/types";
 
 const table = Env.get('PROFILE_TABLE')
 const profileService = new ProfileService({
@@ -27,12 +27,13 @@ export async function handler(event: APIGatewayProxyEvent, context: Context):
     try {
         const accountId = getPathParameter(event, 'accountId')
         const sub = getSub(event)
+        const social: SocialAccount = getEventBody(event)
 
-        const newPhoto = await profileService.addPhoto({
+        const socialAccount = await profileService.addSocial({
             accountId: accountId,
             userId: sub,
-        })
-        result.body = JSON.stringify(newPhoto)
+        },social)
+        result.body = JSON.stringify(socialAccount)
     } catch (error) {
         result.statusCode = 500
         result.body = error.message

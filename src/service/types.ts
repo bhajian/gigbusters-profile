@@ -18,6 +18,7 @@ export interface AddressEntry {
     addressL2: string
 }
 export interface SocialAccount {
+    socialId?: string
     snName: string
     userId: string
     token: string
@@ -68,15 +69,22 @@ export interface ProfileCreateParams {
     interestedCategories: string[]
     settings: SettingEntry
 }
-export interface ProfileGetParams {
+export interface ProfileParams {
     accountId: string
     userId: string
 }
-export interface PhotoDeletetParams {
+export interface PhotoParams {
     photoId: string
     accountId: string
     userId: string
 }
-export type PhotoGetParams = PhotoDeletetParams
-export type ProfileEditParams = ProfileEntity
-export type ProfileDeleteParams = ProfileGetParams
+export interface SocialParams {
+    socialId: string
+    accountId: string
+    userId: string
+}
+export interface CategoryParams {
+    category: string
+    accountId: string
+    userId: string
+}
