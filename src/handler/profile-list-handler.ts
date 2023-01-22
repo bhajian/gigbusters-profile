@@ -26,7 +26,7 @@ export async function handler(event: APIGatewayProxyEvent, context: Context):
     }
     try{
         const userId = getSub(event)
-        const profiles = await profileService.list(userId)
+        const profiles = await profileService.listProfile(userId)
 
         result.body = JSON.stringify(profiles)
         return result

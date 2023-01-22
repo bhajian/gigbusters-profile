@@ -31,6 +31,7 @@ export class ProfileApis extends GenericApi {
     private addPhotoApi: NodejsFunction
     private deletePhotoApi: NodejsFunction
     private listPhotosApi: NodejsFunction
+    private getPhotosApi: NodejsFunction
     private setMainPhotoApi: NodejsFunction
 
     private setLocationApi: NodejsFunction
@@ -209,6 +210,19 @@ export class ProfileApis extends GenericApi {
             authorizer: props.authorizer
         })
 
+        this.getPhotosApi = this.addMethod({
+            functionName: 'profile-photo-get',
+            handlerName: 'profile-photo-get-handler.ts',
+            verb: 'GET',
+            resource: photoIdResource,
+            environment: {
+                PROFILE_TABLE: props.table.tableName
+            },
+            validateRequestBody: false,
+            authorizationType: AuthorizationType.COGNITO,
+            authorizer: props.authorizer
+        })
+
         this.addPhotoApi = this.addMethod({
             functionName: 'profile-photo-add',
             handlerName: 'profile-photo-add-handler.ts',
@@ -252,6 +266,7 @@ export class ProfileApis extends GenericApi {
         props.table.grantFullAccess(this.addPhotoApi.grantPrincipal)
         props.table.grantFullAccess(this.deletePhotoApi.grantPrincipal)
         props.table.grantFullAccess(this.listPhotosApi.grantPrincipal)
+        props.table.grantFullAccess(this.getPhotosApi.grantPrincipal)
     }
 
     private initializeLocationApis(props: ApiProps){

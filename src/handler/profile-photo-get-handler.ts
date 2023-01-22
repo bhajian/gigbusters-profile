@@ -28,12 +28,12 @@ export async function handler(event: APIGatewayProxyEvent, context: Context):
         const accountId = getPathParameter(event, 'accountId')
         const photoId = getPathParameter(event, 'photoId')
         const sub = getSub(event)
-        await service.deletePhoto({
+        const photo = await service.getPhoto({
             accountId: accountId,
             userId: sub,
             photoId: photoId
         })
-        result.body = JSON.stringify({success: true})
+        result.body = JSON.stringify(photo)
     } catch (error) {
         console.error(error.message)
         result.statusCode = 500

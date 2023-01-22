@@ -1,7 +1,3 @@
-export interface ProfileGetParams {
-    accountId: string
-    userId: string
-}
 export interface PhoneEntry {
     phone: string
     verified: boolean
@@ -33,7 +29,7 @@ export interface SettingEntry {
     country: string
 }
 export interface PhotoEntry {
-    id: string
+    photoId: string
     bucket?: string
     key?: string
     main?: boolean
@@ -41,6 +37,7 @@ export interface PhotoEntry {
 export interface ProfileEntity {
     accountId: string
     userId: string
+    active: boolean
     accountType: string
     subscription: string
     name: string
@@ -71,6 +68,15 @@ export interface ProfileCreateParams {
     interestedCategories: string[]
     settings: SettingEntry
 }
-
+export interface ProfileGetParams {
+    accountId: string
+    userId: string
+}
+export interface PhotoDeletetParams {
+    photoId: string
+    accountId: string
+    userId: string
+}
+export type PhotoGetParams = PhotoDeletetParams
 export type ProfileEditParams = ProfileEntity
 export type ProfileDeleteParams = ProfileGetParams

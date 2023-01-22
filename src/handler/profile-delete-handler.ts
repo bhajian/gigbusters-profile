@@ -9,7 +9,7 @@ import {getEventBody, getPathParameter, getSub} from "../lib/utils";
 import {ProfileCreateParams, ProfileDeleteParams} from "../service/types";
 
 const table = Env.get('PROFILE_TABLE')
-const todoService = new ProfileService({
+const service = new ProfileService({
     table: table
 })
 
@@ -27,11 +27,11 @@ export async function handler(event: APIGatewayProxyEvent, context: Context):
     try {
         const accountId = getPathParameter(event, 'accountId')
         const sub = getSub(event)
-        const todo = await todoService.delete({
+        await service.deactivateProfile({
             accountId: accountId,
             userId: sub,
         })
-        result.body = JSON.stringify(todo)
+        result.body = JSON.stringify({'success': true})
     } catch (error) {
         console.error(error.message)
         result.statusCode = 500

@@ -27,7 +27,7 @@ export async function handler(event: APIGatewayProxyEvent, context: Context):
     try {
         const accountId = getPathParameter(event, 'accountId')
         const sub = getSub(event)
-        const todo = await todoService.delete({
+        const todo = await todoService.deleteProfile({
             accountId: accountId,
             userId: sub,
         })
