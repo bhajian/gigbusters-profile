@@ -385,7 +385,8 @@ export class ProfileApis extends GenericApi {
 
     private initializeSocialAccountsApis(props: ApiProps){
         const socialResource = props.idResource.addResource('social')
-        const socialIdResource = socialResource.addResource('{socialId}')
+        const snNameResource = socialResource.addResource('{snName}')
+        const socialUserIdResource = snNameResource.addResource('{socialUserId}')
 
         this.listSocialApi = this.addMethod({
             functionName: 'profile-social-list',
@@ -417,7 +418,7 @@ export class ProfileApis extends GenericApi {
             functionName: 'profile-social-delete',
             handlerName: 'profile-social-delete-handler.ts',
             verb: 'DELETE',
-            resource: socialIdResource,
+            resource: socialUserIdResource,
             environment: {
                 PROFILE_TABLE: props.table.tableName
             },

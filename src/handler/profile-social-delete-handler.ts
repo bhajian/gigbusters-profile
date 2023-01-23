@@ -8,7 +8,7 @@ import {ProfileService} from "../service/profile-service";
 import {getEventBody, getPathParameter, getSub} from "../lib/utils";
 
 const table = Env.get('PROFILE_TABLE')
-const todoService = new ProfileService({
+const service = new ProfileService({
     table: table
 })
 
@@ -25,12 +25,14 @@ export async function handler(event: APIGatewayProxyEvent, context: Context):
     }
     try {
         const accountId = getPathParameter(event, 'accountId')
-        const socialId = getPathParameter(event, 'socialId')
+        const socialUserId = getPathParameter(event, 'socialUserId')
+        const snName = getPathParameter(event, 'snName')
         const sub = getSub(event)
-        await todoService.deleteSocial({
-            socialId: socialId,
+        await service.deleteSocial({
             accountId: accountId,
-            userId: sub
+            userId: sub,
+            snName: snName,
+            socialUserId: socialUserId
         })
         result.body = JSON.stringify({success: true})
     } catch (error) {

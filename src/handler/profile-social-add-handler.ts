@@ -6,7 +6,7 @@ import {
 import {getEventBody, getPathParameter, getSub} from "../lib/utils";
 import {Env} from "../lib/env";
 import {ProfileService} from "../service/profile-service";
-import {ProfileCreateParams, SocialAccount} from "../service/types";
+import {ProfileCreateParams, SocialEntry} from "../service/types";
 
 const table = Env.get('PROFILE_TABLE')
 const profileService = new ProfileService({
@@ -27,7 +27,7 @@ export async function handler(event: APIGatewayProxyEvent, context: Context):
     try {
         const accountId = getPathParameter(event, 'accountId')
         const sub = getSub(event)
-        const social: SocialAccount = getEventBody(event)
+        const social: SocialEntry = getEventBody(event)
 
         const socialAccount = await profileService.addSocial({
             accountId: accountId,

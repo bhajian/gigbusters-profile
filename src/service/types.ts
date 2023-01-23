@@ -17,10 +17,9 @@ export interface AddressEntry {
     addressL1: string
     addressL2: string
 }
-export interface SocialAccount {
-    socialId?: string
+export interface SocialEntry {
     snName: string
-    userId: string
+    socialUserId: string
     token: string
     secret: string
 }
@@ -49,7 +48,7 @@ export interface ProfileEntity {
     address: AddressEntry
     location: LocationEntry
     photos: PhotoEntry[]
-    socialAccounts: SocialAccount[]
+    socialAccounts: SocialEntry[]
     interestedCategories: string[]
     settings: SettingEntry
 }
@@ -65,7 +64,7 @@ export interface ProfileCreateParams {
     address: AddressEntry
     location: LocationEntry
     photos: PhotoEntry[]
-    socialAccounts: SocialAccount[]
+    socialAccounts: SocialEntry[]
     interestedCategories: string[]
     settings: SettingEntry
 }
@@ -79,7 +78,8 @@ export interface PhotoParams {
     userId: string
 }
 export interface SocialParams {
-    socialId: string
+    snName: string
+    socialUserId: string
     accountId: string
     userId: string
 }

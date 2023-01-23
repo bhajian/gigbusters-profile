@@ -10,7 +10,7 @@ import {
     ProfileCreateParams,
     ProfileEntity,
     SettingEntry,
-    SocialAccount,
+    SocialEntry,
     ProfileParams
 } from "./types";
 
@@ -286,11 +286,7 @@ export class ProfileService {
         return {}
     }
 
-    async addSocial(params: ProfileParams, socialParams: SocialAccount): Promise<any> {
-        const newSocialAccount: SocialAccount = {
-            socialId: uuidv4(),
-            ...socialParams
-        }
+    async addSocial(params: ProfileParams, socialParams: SocialEntry): Promise<any> {
         const response = await this.documentClient
             .get({
                 TableName: this.props.table,
@@ -298,16 +294,24 @@ export class ProfileService {
                     accountId: params.accountId,
                 },
             }).promise()
-        if (response.Item && response.Item.userId === params.userId) {
-            if(response.Item.socialAccounts){
-                response.Item.socialAccounts.push(newSocialAccount)
+        const profile = response.Item
+        if (profile && profile.userId === params.userId) {
+            if(profile.socialAccounts){
+                const index = profile.socialAccounts
+                    .findIndex((item: SocialEntry) => (item.snName == socialParams.snName &&
+                        item.socialUserId == socialParams.socialUserId))
+                if(index >= 0){
+                    profile.socialAccounts[index] = socialParams
+                }else {
+                    profile.socialAccounts.push(socialParams)
+                }
             } else{
-                response.Item.socialAccounts = [newSocialAccount]
+                profile.socialAccounts = [socialParams]
             }
             await this.documentClient
                 .put({
                     TableName: this.props.table,
-                    Item: response.Item,
+                    Item: profile,
                     ConditionExpression: 'userId = :userId',
                     ExpressionAttributeValues : {':userId' : params.userId}
                 }).promise()
@@ -315,7 +319,7 @@ export class ProfileService {
             throw new Error('The profile was not found for this accountId' +
                 ' or the user did not match the profile owner.')
         }
-        return newSocialAccount
+        return socialParams
     }
 
     async deleteSocial(params: SocialParams): Promise<any> {
@@ -328,16 +332,19 @@ export class ProfileService {
             }).promise()
         const profile = response.Item
         if (profile && profile.socialAccounts && profile.userId === params.userId) {
-            const socialsWithoutItem = profile.socialAccounts
-                .filter((item: SocialAccount) => item.socialId != params.socialId)
-            profile.socialAccounts = socialsWithoutItem
-            await this.documentClient
-                .put({
-                    TableName: this.props.table,
-                    Item: profile,
-                    ConditionExpression: 'userId = :userId',
-                    ExpressionAttributeValues : {':userId' : params.userId}
-                }).promise()
+            const index = profile.socialAccounts
+                .findIndex((item: SocialEntry) => (item.snName === params.snName &&
+                    item.socialUserId === params.socialUserId))
+            if(index >= 0){
+                profile.socialAccounts.splice(index, 1)
+                await this.documentClient
+                    .put({
+                        TableName: this.props.table,
+                        Item: profile,
+                        ConditionExpression: 'userId = :userId',
+                        ExpressionAttributeValues : {':userId' : params.userId}
+                    }).promise()
+            }
         }
         return
     }
@@ -355,7 +362,7 @@ export class ProfileService {
             response.Item.userId != params.userId) {
             return []
         }
-        return response.Item.socialAccounts as SocialAccount[]
+        return response.Item.socialAccounts as SocialEntry[]
     }
 
     async addCategory(params: CategoryParams): Promise<any> {
