@@ -3,10 +3,9 @@ import {
     APIGatewayProxyResult,
     APIGatewayProxyEvent
 } from 'aws-lambda';
-import {getEventBody, getPathParameter, getSub} from "../lib/utils";
+import {getPathParameter, getSub} from "../lib/utils";
 import {Env} from "../lib/env";
 import {ProfileService} from "../service/profile-service";
-import {ProfileCreateParams} from "../service/types";
 
 const table = Env.get('PROFILE_TABLE')
 const profileService = new ProfileService({

@@ -8,7 +8,7 @@ import {ProfileService} from "../service/profile-service";
 import {getEventBody, getPathParameter, getSub} from "../lib/utils";
 
 const table = Env.get('PROFILE_TABLE')
-const todoService = new ProfileService({
+const service = new ProfileService({
     table: table
 })
 
@@ -27,7 +27,7 @@ export async function handler(event: APIGatewayProxyEvent, context: Context):
         const accountId = getPathParameter(event, 'accountId')
         const category = getPathParameter(event, 'categoryId')
         const sub = getSub(event)
-        await todoService.deleteCategory({
+        await service.deleteCategory({
             accountId: accountId,
             userId: sub,
             category: category
