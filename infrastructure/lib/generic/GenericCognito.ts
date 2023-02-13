@@ -69,12 +69,12 @@ export class GenericCognito extends Construct{
             removalPolicy: RemovalPolicy.DESTROY,
             userPoolName: props.userPoolName,
             selfSignUpEnabled: props.selfSignUpEnabled,
-            email: UserPoolEmail.withCognito('support@myawesomeapp.com'),
+            email: UserPoolEmail.withCognito('support@orbitstellar.com'), // FIX ME
             userVerification: {
-                emailSubject: 'Verify your email for our awesome app!',
-                emailBody: 'Thanks for signing up to our awesome app! Your verification code is {####}',
+                emailSubject: 'Verify your email to access your account!',
+                emailBody: 'Thanks for signing up to the Tietap app! Your verification code is {####}',
                 emailStyle: VerificationEmailStyle.CODE,
-                smsMessage: 'Thanks for signing up to our awesome app! Your verification code is {####}',
+                smsMessage: 'Thanks for signing up to the Tietap app! Your verification code is {####}',
             },
             standardAttributes: {
                 email: {
@@ -137,6 +137,10 @@ export class GenericCognito extends Construct{
                 custom: props.authFlow.custom,
                 userPassword: props.authFlow.userPassword,
                 userSrp: props.authFlow.userSrp
+            },
+            oAuth:{
+                callbackUrls: ['https://api.dev2.fameorbit.com/profile/token/'], // FIX ME
+                logoutUrls: ['https://dev2.fameorbit.com/signout/']
             },
             generateSecret: false
         });

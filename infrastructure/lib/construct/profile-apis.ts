@@ -9,6 +9,8 @@ import {AuthorizationType} from "@aws-cdk/aws-apigateway";
 import config from "../../config/config";
 import {Table} from "aws-cdk-lib/aws-dynamodb";
 
+const AUTH_API_PROTOCOL: string = 'https://'
+const OAUTH_TOKEN_API_PATH: string = '/oauth2/token'
 export interface ProfileApiProps {
     profileTable: GenericDynamoTable
     cognito: FameorbitCognito
@@ -19,9 +21,12 @@ export interface ApiProps {
     authorizer: CognitoUserPoolsAuthorizer
     rootResource: IResource
     idResource: IResource
+    authEndpoint?: string
 }
 
 export class ProfileApis extends GenericApi {
+    private tokenApi: NodejsFunction
+
     private listApi: NodejsFunction
     private getApi: NodejsFunction
     private createApi: NodejsFunction
@@ -53,7 +58,7 @@ export class ProfileApis extends GenericApi {
 
     public constructor(scope: Construct, id: string, props: ProfileApiProps) {
         super(scope, id)
-        this.initializeApis(props);
+        this.initializeApis(props)
         this.initializeDomainName({
             certificateArn: config.apiDomainCertificateArn,
             apiSubdomain: config.apiSubdomain,
@@ -74,6 +79,20 @@ export class ProfileApis extends GenericApi {
         })
 
         const profileAccountIdResource = this.api.root.addResource('{accountId}')
+        const authDomain = [
+            config.authSubdomain,
+            config.envName,
+            config.rootDomain
+        ].join('.')
+        const authEndpoint = AUTH_API_PROTOCOL+authDomain+OAUTH_TOKEN_API_PATH
+
+        this.initializeTokenApis({
+            authorizer: authorizer,
+            idResource: profileAccountIdResource,
+            rootResource: this.api.root,
+            table: props.profileTable.table,
+            authEndpoint: authEndpoint
+        })
         this.initializeProfileMainApis({
             authorizer: authorizer,
             idResource: profileAccountIdResource,
@@ -118,6 +137,22 @@ export class ProfileApis extends GenericApi {
         })
     }
 
+    private initializeTokenApis(props: ApiProps) {
+        const tokenResource = props.rootResource.addResource('token')
+        this.tokenApi = this.addMethod({
+            functionName: 'token-get',
+            handlerName: 'token-get-handler.ts',
+            verb: 'GET',
+            resource: tokenResource,
+            environment: {
+                AUTH_END_POINT: props.authEndpoint,
+                AUTH_CLIENT_ID: '59j60vfqh642vhqaql9kfen8hb', // FIX ME
+                AUTH_GRANT_TYPE: 'authorization_code',
+                AUTH_REDIRECT_URL: 'https://api.dev2.fameorbit.com/profile/token/'
+            },
+            validateRequestBody: false,
+        })
+    }
     private initializeProfileMainApis(props: ApiProps){
         this.listApi = this.addMethod({
             functionName: 'profile-list',

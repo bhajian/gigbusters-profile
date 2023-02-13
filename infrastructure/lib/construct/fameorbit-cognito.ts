@@ -1,10 +1,6 @@
 import {Construct} from "constructs";
-import {GenericDynamoTable} from "../generic/GenericDynamoTable";
-import {GenericApi} from "../generic/GenericApi";
-import {NodejsFunction} from "aws-cdk-lib/aws-lambda-nodejs";
-import {createProfileSchema, editProfileSchema} from "./profile-schema";
 import {GenericCognito} from "../generic/GenericCognito";
-import {UserPool} from "aws-cdk-lib/aws-cognito";
+
 import config from "../../config/config";
 
 export interface ProfileCognitoProps {
