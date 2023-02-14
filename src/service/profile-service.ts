@@ -56,22 +56,22 @@ export class ProfileService {
         return response.Item as ProfileEntity
     }
 
-    private generateRandomCode(): number{
+    private generateRandomCode(): string{
         const rand1 = Math.floor(Math.random() * 1000)
         const rand2 = Date.now()
-        let i=0
-        while(Math.pow(10,i)< rand2){
-            i++
-        }
-        return rand1 * Math.pow(10,i) + rand2
+        const number = rand2 * Math.pow(10,4) + rand1
+        const strNumber = number.toString()
+        return strNumber.slice(strNumber.length - 9 , strNumber.length)
     }
 
     async createProfile(params: ProfileCreateParams): Promise<ProfileEntity> {
         const profile: ProfileEntity = {
-            accountId: uuidv4(),
+            accountId: params.userId,
             active: true,
             ...params,
         }
+        profile.accountCode = this.generateRandomCode()
+
         const response = await this.documentClient
             .put({
                 TableName: this.props.table,

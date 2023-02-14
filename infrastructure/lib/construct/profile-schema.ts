@@ -3,9 +3,7 @@ import {JsonSchemaType} from "aws-cdk-lib/aws-apigateway";
 export const createProfileSchema = {
     type: JsonSchemaType.OBJECT,
     required: [
-        "accountType", "subscription", "name", "lastName", "bio",
-        "phone", "email", "address", "location", "photos",
-        "socialAccounts", "interestedCategories", "settings"
+        "accountType", "subscription", "name", "email",
     ],
     properties: {
         accountType: {
@@ -17,7 +15,7 @@ export const createProfileSchema = {
         name: {
             type: JsonSchemaType.STRING
         },
-        lastName: {
+        accountCode: {
             type: JsonSchemaType.STRING
         },
         bio: {
@@ -49,7 +47,7 @@ export const createProfileSchema = {
         },
         address: {
             type: JsonSchemaType.OBJECT,
-            required: ["country", "state", "city", "addressL1", "addressL2"],
+            required: ["country", "state", "city", "addressL1"],
             properties: {
                 country: {
                     type: JsonSchemaType.STRING
@@ -133,9 +131,7 @@ export const createProfileSchema = {
 export const editProfileSchema = {
     type: JsonSchemaType.OBJECT,
     required: [
-        "accountId", "accountType", "subscription", "name", "lastName",
-        "bio", "phone", "email", "address", "location", "photos",
-        "socialAccounts", "interestedCategories", "settings"
+        "accountId", "accountType", "subscription", "name", "email",
     ],
     properties: {
         accountId: {
@@ -150,7 +146,7 @@ export const editProfileSchema = {
         name: {
             type: JsonSchemaType.STRING
         },
-        lastName: {
+        accountCode: {
             type: JsonSchemaType.STRING
         },
         bio: {
@@ -182,7 +178,7 @@ export const editProfileSchema = {
         },
         address: {
             type: JsonSchemaType.OBJECT,
-            required: ["country", "state", "city", "addressL1", "addressL2"],
+            required: ["country", "state", "city", "addressL1"],
             properties: {
                 country: {
                     type: JsonSchemaType.STRING

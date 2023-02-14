@@ -41,7 +41,7 @@ export interface ProfileEntity {
     accountType: string
     subscription: string
     name: string
-    lastName: string
+    accountCode: string
     bio: string
     phone: PhoneEntry
     email: EmailEntry
@@ -57,7 +57,7 @@ export interface ProfileCreateParams {
     accountType: string
     subscription: string
     name: string
-    lastName: string
+    accountCode: string
     bio: string
     phone: PhoneEntry
     email: EmailEntry

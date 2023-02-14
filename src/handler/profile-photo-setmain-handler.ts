@@ -6,7 +6,7 @@ import {
 import {getEventBody, getSub} from "../lib/utils";
 import {Env} from "../lib/env";
 import {ProfileService} from "../service/profile-service";
-import {ProfileEditParams} from "../service/types";
+import {ProfileEntity} from "../service/types";
 
 const table = Env.get('PROFILE_TABLE')
 const todoService = new ProfileService({
@@ -26,7 +26,7 @@ export async function handler(event: APIGatewayProxyEvent, context: Context):
         body: 'Hello From Todo Edit Api!'
     }
     try {
-        const item = getEventBody(event) as ProfileEditParams;
+        const item = getEventBody(event) as ProfileEntity;
         const sub = getSub(event)
         item.userId = sub
         const profile = await todoService.editProfile(item)
