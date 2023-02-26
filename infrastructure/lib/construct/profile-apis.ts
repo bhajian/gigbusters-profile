@@ -8,16 +8,20 @@ import {CognitoUserPoolsAuthorizer, IResource} from "aws-cdk-lib/aws-apigateway"
 import {AuthorizationType} from "@aws-cdk/aws-apigateway";
 import config from "../../config/config";
 import {Table} from "aws-cdk-lib/aws-dynamodb";
+import { PolicyStatement } from "aws-cdk-lib/aws-iam";
+import {Bucket} from "aws-cdk-lib/aws-s3";
 
 const AUTH_API_PROTOCOL: string = 'https://'
 const OAUTH_TOKEN_API_PATH: string = '/oauth2/token'
 export interface ProfileApiProps {
     profileTable: GenericDynamoTable
     cognito: FameorbitCognito
+    profilePhotoBucket: Bucket
 }
 
 export interface ApiProps {
     table: Table
+    profilePhotoBucket: Bucket
     authorizer: CognitoUserPoolsAuthorizer
     rootResource: IResource
     idResource: IResource
@@ -91,49 +95,57 @@ export class ProfileApis extends GenericApi {
             idResource: profileAccountIdResource,
             rootResource: this.api.root,
             table: props.profileTable.table,
+            profilePhotoBucket: props.profilePhotoBucket,
             authEndpoint: authEndpoint
         })
         this.initializeProfileMainApis({
             authorizer: authorizer,
             idResource: profileAccountIdResource,
             rootResource: this.api.root,
-            table: props.profileTable.table
+            table: props.profileTable.table,
+            profilePhotoBucket: props.profilePhotoBucket,
         })
         this.initializeProfilePhotoApis({
             authorizer: authorizer,
             idResource: profileAccountIdResource,
             rootResource: this.api.root,
-            table: props.profileTable.table
+            table: props.profileTable.table,
+            profilePhotoBucket: props.profilePhotoBucket,
         })
         this.initializeLocationApis({
             authorizer: authorizer,
             idResource: profileAccountIdResource,
             rootResource: this.api.root,
-            table: props.profileTable.table
+            table: props.profileTable.table,
+            profilePhotoBucket: props.profilePhotoBucket,
         })
         this.initializeSettingsApis({
             authorizer: authorizer,
             idResource: profileAccountIdResource,
             rootResource: this.api.root,
-            table: props.profileTable.table
+            table: props.profileTable.table,
+            profilePhotoBucket: props.profilePhotoBucket,
         })
         this.initializeProfileCategoryApis({
             authorizer: authorizer,
             idResource: profileAccountIdResource,
             rootResource: this.api.root,
-            table: props.profileTable.table
+            table: props.profileTable.table,
+            profilePhotoBucket: props.profilePhotoBucket,
         })
         this.initializeSocialAccountsApis({
             authorizer: authorizer,
             idResource: profileAccountIdResource,
             rootResource: this.api.root,
-            table: props.profileTable.table
+            table: props.profileTable.table,
+            profilePhotoBucket: props.profilePhotoBucket,
         })
         this.initializeValidateApis({
             authorizer: authorizer,
             idResource: profileAccountIdResource,
             rootResource: this.api.root,
-            table: props.profileTable.table
+            table: props.profileTable.table,
+            profilePhotoBucket: props.profilePhotoBucket,
         })
     }
 
@@ -160,7 +172,8 @@ export class ProfileApis extends GenericApi {
             verb: 'GET',
             resource: props.rootResource,
             environment: {
-                PROFILE_TABLE: props.table.tableName
+                PROFILE_TABLE: props.table.tableName,
+                PROFILE_BUCKET: props.profilePhotoBucket.bucketName
             },
             validateRequestBody: false,
             authorizationType: AuthorizationType.COGNITO,
@@ -173,7 +186,8 @@ export class ProfileApis extends GenericApi {
             verb: 'GET',
             resource: props.idResource,
             environment: {
-                PROFILE_TABLE: props.table.tableName
+                PROFILE_TABLE: props.table.tableName,
+                PROFILE_BUCKET: props.profilePhotoBucket.bucketName
             },
             validateRequestBody: false,
             authorizationType: AuthorizationType.COGNITO,
@@ -186,7 +200,8 @@ export class ProfileApis extends GenericApi {
             verb: 'POST',
             resource: props.rootResource,
             environment: {
-                PROFILE_TABLE: props.table.tableName
+                PROFILE_TABLE: props.table.tableName,
+                PROFILE_BUCKET: props.profilePhotoBucket.bucketName
             },
             validateRequestBody: true,
             bodySchema: createProfileSchema,
@@ -200,7 +215,8 @@ export class ProfileApis extends GenericApi {
             verb: 'PUT',
             resource: props.rootResource,
             environment: {
-                PROFILE_TABLE: props.table.tableName
+                PROFILE_TABLE: props.table.tableName,
+                PROFILE_BUCKET: props.profilePhotoBucket.bucketName
             },
             validateRequestBody: true,
             bodySchema: editProfileSchema,
@@ -214,7 +230,8 @@ export class ProfileApis extends GenericApi {
             verb: 'DELETE',
             resource: props.idResource,
             environment: {
-                PROFILE_TABLE: props.table.tableName
+                PROFILE_TABLE: props.table.tableName,
+                PROFILE_BUCKET: props.profilePhotoBucket.bucketName
             },
             validateRequestBody: false,
             authorizationType: AuthorizationType.COGNITO,
@@ -238,7 +255,8 @@ export class ProfileApis extends GenericApi {
             verb: 'GET',
             resource: photoResource,
             environment: {
-                PROFILE_TABLE: props.table.tableName
+                PROFILE_TABLE: props.table.tableName,
+                PROFILE_BUCKET: props.profilePhotoBucket.bucketName
             },
             validateRequestBody: false,
             authorizationType: AuthorizationType.COGNITO,
@@ -251,7 +269,8 @@ export class ProfileApis extends GenericApi {
             verb: 'GET',
             resource: photoIdResource,
             environment: {
-                PROFILE_TABLE: props.table.tableName
+                PROFILE_TABLE: props.table.tableName,
+                PROFILE_BUCKET: props.profilePhotoBucket.bucketName
             },
             validateRequestBody: false,
             authorizationType: AuthorizationType.COGNITO,
@@ -264,7 +283,8 @@ export class ProfileApis extends GenericApi {
             verb: 'POST',
             resource: photoResource,
             environment: {
-                PROFILE_TABLE: props.table.tableName
+                PROFILE_TABLE: props.table.tableName,
+                PROFILE_BUCKET: props.profilePhotoBucket.bucketName
             },
             validateRequestBody: false,
             authorizationType: AuthorizationType.COGNITO,
@@ -277,7 +297,8 @@ export class ProfileApis extends GenericApi {
             verb: 'DELETE',
             resource: photoIdResource,
             environment: {
-                PROFILE_TABLE: props.table.tableName
+                PROFILE_TABLE: props.table.tableName,
+                PROFILE_BUCKET: props.profilePhotoBucket.bucketName
             },
             validateRequestBody: false,
             authorizationType: AuthorizationType.COGNITO,
@@ -290,7 +311,8 @@ export class ProfileApis extends GenericApi {
             verb: 'PUT',
             resource: photoIdResource,
             environment: {
-                PROFILE_TABLE: props.table.tableName
+                PROFILE_TABLE: props.table.tableName,
+                PROFILE_BUCKET: props.profilePhotoBucket.bucketName
             },
             validateRequestBody: false,
             authorizationType: AuthorizationType.COGNITO,
@@ -313,7 +335,8 @@ export class ProfileApis extends GenericApi {
             verb: 'PUT',
             resource: locationResource,
             environment: {
-                PROFILE_TABLE: props.table.tableName
+                PROFILE_TABLE: props.table.tableName,
+                PROFILE_BUCKET: props.profilePhotoBucket.bucketName
             },
             validateRequestBody: false,
             authorizationType: AuthorizationType.COGNITO,
@@ -326,7 +349,8 @@ export class ProfileApis extends GenericApi {
             verb: 'GET',
             resource: locationResource,
             environment: {
-                PROFILE_TABLE: props.table.tableName
+                PROFILE_TABLE: props.table.tableName,
+                PROFILE_BUCKET: props.profilePhotoBucket.bucketName
             },
             validateRequestBody: false,
             authorizationType: AuthorizationType.COGNITO,
@@ -346,7 +370,8 @@ export class ProfileApis extends GenericApi {
             verb: 'PUT',
             resource: settingsResource,
             environment: {
-                PROFILE_TABLE: props.table.tableName
+                PROFILE_TABLE: props.table.tableName,
+                PROFILE_BUCKET: props.profilePhotoBucket.bucketName
             },
             validateRequestBody: false,
             authorizationType: AuthorizationType.COGNITO,
@@ -359,7 +384,8 @@ export class ProfileApis extends GenericApi {
             verb: 'GET',
             resource: settingsResource,
             environment: {
-                PROFILE_TABLE: props.table.tableName
+                PROFILE_TABLE: props.table.tableName,
+                PROFILE_BUCKET: props.profilePhotoBucket.bucketName
             },
             validateRequestBody: false,
             authorizationType: AuthorizationType.COGNITO,
@@ -380,7 +406,8 @@ export class ProfileApis extends GenericApi {
             verb: 'GET',
             resource: categoryResource,
             environment: {
-                PROFILE_TABLE: props.table.tableName
+                PROFILE_TABLE: props.table.tableName,
+                PROFILE_BUCKET: props.profilePhotoBucket.bucketName
             },
             validateRequestBody: false,
             authorizationType: AuthorizationType.COGNITO,
@@ -393,7 +420,8 @@ export class ProfileApis extends GenericApi {
             verb: 'POST',
             resource: categoryResource,
             environment: {
-                PROFILE_TABLE: props.table.tableName
+                PROFILE_TABLE: props.table.tableName,
+                PROFILE_BUCKET: props.profilePhotoBucket.bucketName
             },
             validateRequestBody: false,
             authorizationType: AuthorizationType.COGNITO,
@@ -406,7 +434,8 @@ export class ProfileApis extends GenericApi {
             verb: 'DELETE',
             resource: categoryIdResource,
             environment: {
-                PROFILE_TABLE: props.table.tableName
+                PROFILE_TABLE: props.table.tableName,
+                PROFILE_BUCKET: props.profilePhotoBucket.bucketName
             },
             validateRequestBody: false,
             authorizationType: AuthorizationType.COGNITO,
@@ -429,7 +458,8 @@ export class ProfileApis extends GenericApi {
             verb: 'GET',
             resource: socialResource,
             environment: {
-                PROFILE_TABLE: props.table.tableName
+                PROFILE_TABLE: props.table.tableName,
+                PROFILE_BUCKET: props.profilePhotoBucket.bucketName
             },
             validateRequestBody: false,
             authorizationType: AuthorizationType.COGNITO,
@@ -442,7 +472,8 @@ export class ProfileApis extends GenericApi {
             verb: 'POST',
             resource: socialResource,
             environment: {
-                PROFILE_TABLE: props.table.tableName
+                PROFILE_TABLE: props.table.tableName,
+                PROFILE_BUCKET: props.profilePhotoBucket.bucketName
             },
             validateRequestBody: false,
             authorizationType: AuthorizationType.COGNITO,
@@ -455,7 +486,8 @@ export class ProfileApis extends GenericApi {
             verb: 'DELETE',
             resource: socialUserIdResource,
             environment: {
-                PROFILE_TABLE: props.table.tableName
+                PROFILE_TABLE: props.table.tableName,
+                PROFILE_BUCKET: props.profilePhotoBucket.bucketName
             },
             validateRequestBody: false,
             authorizationType: AuthorizationType.COGNITO,
@@ -477,7 +509,8 @@ export class ProfileApis extends GenericApi {
             verb: 'POST',
             resource: validateResource,
             environment: {
-                PROFILE_TABLE: props.table.tableName
+                PROFILE_TABLE: props.table.tableName,
+                PROFILE_BUCKET: props.profilePhotoBucket.bucketName
             },
             validateRequestBody: false,
             authorizationType: AuthorizationType.COGNITO,
@@ -489,13 +522,23 @@ export class ProfileApis extends GenericApi {
             verb: 'POST',
             resource: requestValidationResource,
             environment: {
-                PROFILE_TABLE: props.table.tableName
+                PROFILE_TABLE: props.table.tableName,
+                PROFILE_BUCKET: props.profilePhotoBucket.bucketName
             },
             validateRequestBody: false,
             authorizationType: AuthorizationType.COGNITO,
             authorizer: props.authorizer
         })
         props.table.grantFullAccess(this.validateApi.grantPrincipal)
+        props.table.grantFullAccess(this.requestValidationApi.grantPrincipal)
+
+        const snsTopicPolicy = new PolicyStatement({
+            actions: ['sns:publish'],
+            resources: ['*'],
+        });
+
+        this.requestValidationApi.addToRolePolicy(snsTopicPolicy);
+
     }
 
     protected createAuthorizer(props: AuthorizerProps): CognitoUserPoolsAuthorizer{

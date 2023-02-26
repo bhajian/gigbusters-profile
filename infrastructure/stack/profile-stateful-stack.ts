@@ -8,6 +8,7 @@ import {FameorbitCognito} from "../lib/construct/fameorbit-cognito";
 import {AttributeType, StreamViewType} from "aws-cdk-lib/aws-dynamodb";
 import {ARecord, HostedZone, RecordTarget} from "aws-cdk-lib/aws-route53";
 import config from "../config/config";
+import {Topic} from "aws-cdk-lib/aws-sns";
 
 
 export class ProfileStatefulStack extends Stack {
@@ -15,6 +16,7 @@ export class ProfileStatefulStack extends Stack {
     public profilePhotoBucket: Bucket
     public uploadProfilePhotosPolicy: PolicyStatement
     public cognito: FameorbitCognito
+    public snsTopic: Topic
     private suffix: string;
 
     constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -25,7 +27,7 @@ export class ProfileStatefulStack extends Stack {
         this.initializeDynamodbTable()
         this.initializeBucketPolicies()
         this.initializeCognito()
-
+        this.snsTopic = new Topic(this, 'Topic')
 
     }
 

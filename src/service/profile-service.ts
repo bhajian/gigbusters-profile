@@ -13,15 +13,17 @@ import {
     SocialEntry,
     ProfileParams
 } from "./types";
+import SNS from "aws-sdk/clients/sns";
 
 interface ProfileServiceProps{
     table: string
+    bucket: string
 }
 
 export class ProfileService {
-
     private props: ProfileServiceProps
     private documentClient = new DocumentClient()
+    private sns =new SNS({apiVersion: '2010–03–31'})
 
     public constructor(props: ProfileServiceProps){
         this.props = props
@@ -56,21 +58,13 @@ export class ProfileService {
         return response.Item as ProfileEntity
     }
 
-    private generateRandomCode(): string{
-        const rand1 = Math.floor(Math.random() * 1000)
-        const rand2 = Date.now()
-        const number = rand2 * Math.pow(10,4) + rand1
-        const strNumber = number.toString()
-        return strNumber.slice(strNumber.length - 9 , strNumber.length)
-    }
-
     async createProfile(params: ProfileCreateParams): Promise<ProfileEntity> {
         const profile: ProfileEntity = {
             accountId: params.userId,
             active: true,
             ...params,
         }
-        profile.accountCode = this.generateRandomCode()
+        profile.accountCode = this.generateAccountId()
 
         const response = await this.documentClient
             .put({
@@ -154,9 +148,13 @@ export class ProfileService {
         return {}
     }
 
-    async addPhoto(params: ProfileParams): Promise<PhotoEntry> {
+    async addPhoto(params: ProfileParams, photoParams: PhotoEntry): Promise<PhotoEntry> {
+        const photoId = uuidv4()
         const newPhoto = {
-            photoId: uuidv4(),
+            photoId: photoId,
+            bucket: this.props.bucket,
+            key: `${params.accountId}/photos/${photoId}`,
+            main: photoParams.main
         }
         const response = await this.documentClient
             .get({
@@ -420,6 +418,104 @@ export class ProfileService {
             return [] as string[]
         }
         return response.Item.interestedCategories as string[]
+    }
+
+    async requestValidation(params: any): Promise<any> {
+        try{
+            const response = await this.documentClient
+                .get({
+                    TableName: this.props.table,
+                    Key: {
+                        accountId: params.accountId,
+                    },
+                }).promise()
+            if(!response.Item){
+                throw new Error('Profile does not exist.')
+            }
+            const profile = response.Item
+            const code = this.generateRandomCode()
+            if(profile && profile.phone && params.verifyObject === 'phone'){
+                profile.phone.validationCode = code
+                profile.phone.phone = params.phoneNumber
+                profile.phone.verified = false
+            }
+            if(profile && profile.email && params.verifyObject === 'email'){
+                profile.email.validationCode = code
+                profile.phone.email = params.email
+                profile.phone.verified = false
+            }
+            const smsParams = {
+                Message: `Your Verification Code is: ${code}`,
+                PhoneNumber: params.phoneNumber,
+            };
+            await this.sns.publish(smsParams).promise()
+            await this.documentClient
+                .put({
+                    TableName: this.props.table,
+                    Item: profile,
+                    ConditionExpression: 'userId = :userId',
+                    ExpressionAttributeValues : {':userId' : params.userId}
+                }).promise()
+            return params
+        } catch (e) {
+            throw e
+        }
+    }
+
+
+    async validate(params: any): Promise<any> {
+        try{
+            const beforeValidation = await this.documentClient
+                .get({
+                    TableName: this.props.table,
+                    Key: {
+                        accountId: params.accountId,
+                    },
+                }).promise()
+            if(!beforeValidation.Item){
+                throw new Error('Profile does not exist.')
+            }
+            const profile = beforeValidation.Item
+            let changed = false
+            if(profile && profile.phone && params.verifyObject === 'phone'
+                && profile.phone.validationCode === params.code){
+                profile.phone.verified = true
+                changed = true
+            }
+            if(profile && profile.email && params.verifyObject === 'email'
+                && profile.email.validationCode === params.code){
+                profile.phone.verified = true
+                changed = true
+            }
+            if(changed){
+                await this.documentClient
+                    .put({
+                        TableName: this.props.table,
+                        Item: profile,
+                        ConditionExpression: 'userId = :userId',
+                        ExpressionAttributeValues : {':userId' : params.userId}
+                    }).promise()
+                return params
+            } else{
+                throw new Error('The profile was not verified!')
+            }
+        } catch (e) {
+            throw e
+        }
+    }
+
+    private generateAccountId(): string{
+        const rand1 = Math.floor(Math.random() * 1000)
+        const rand2 = Date.now()
+        const number = rand2 * Math.pow(10,4) + rand1
+        const strNumber = number.toString()
+        return strNumber.slice(strNumber.length - 9 , strNumber.length)
+    }
+
+    private generateRandomCode(): string{
+        const rand1 = Math.floor(Math.random() * 1000000)
+        const strNumber = rand1.toString()
+        return strNumber
     }
 
 }

@@ -5,11 +5,13 @@ import {
 } from 'aws-lambda';
 import {Env} from "../lib/env";
 import {ProfileService} from "../service/profile-service";
-import {getPathParameter, getQueryString, getSub} from "../lib/utils";
+import {getSub} from "../lib/utils";
 
 const table = Env.get('PROFILE_TABLE')
+const bucket = Env.get('PROFILE_BUCKET')
 const profileService = new ProfileService({
-    table: table
+    table: table,
+    bucket: bucket
 })
 
 export async function handler(event: APIGatewayProxyEvent, context: Context):

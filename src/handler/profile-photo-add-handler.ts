@@ -6,11 +6,13 @@ import {
 import {getEventBody, getPathParameter, getSub} from "../lib/utils";
 import {Env} from "../lib/env";
 import {ProfileService} from "../service/profile-service";
-import {ProfileCreateParams} from "../service/types";
+import {PhotoEntry} from "../service/types";
 
 const table = Env.get('PROFILE_TABLE')
+const bucket = Env.get('PROFILE_BUCKET')
 const profileService = new ProfileService({
-    table: table
+    table: table,
+    bucket: bucket
 })
 
 export async function handler(event: APIGatewayProxyEvent, context: Context):
@@ -27,11 +29,12 @@ export async function handler(event: APIGatewayProxyEvent, context: Context):
     try {
         const accountId = getPathParameter(event, 'accountId')
         const sub = getSub(event)
+        const item = getEventBody(event) as PhotoEntry
 
         const newPhoto = await profileService.addPhoto({
             accountId: accountId,
             userId: sub,
-        })
+        }, item)
         result.body = JSON.stringify(newPhoto)
     } catch (error) {
         result.statusCode = 500

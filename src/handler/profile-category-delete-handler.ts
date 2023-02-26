@@ -8,8 +8,10 @@ import {ProfileService} from "../service/profile-service";
 import {getEventBody, getPathParameter, getSub} from "../lib/utils";
 
 const table = Env.get('PROFILE_TABLE')
-const service = new ProfileService({
-    table: table
+const bucket = Env.get('PROFILE_BUCKET')
+const profileService = new ProfileService({
+    table: table,
+    bucket: bucket
 })
 
 export async function handler(event: APIGatewayProxyEvent, context: Context):
@@ -27,7 +29,7 @@ export async function handler(event: APIGatewayProxyEvent, context: Context):
         const accountId = getPathParameter(event, 'accountId')
         const category = getPathParameter(event, 'categoryId')
         const sub = getSub(event)
-        await service.deleteCategory({
+        await profileService.deleteCategory({
             accountId: accountId,
             userId: sub,
             category: category

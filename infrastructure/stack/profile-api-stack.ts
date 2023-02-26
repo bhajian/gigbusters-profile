@@ -16,7 +16,8 @@ export class ProfileApiStack extends Stack {
     super(scope, id, props);
     this.profileApis = new ProfileApis(this,id, {
       profileTable: todoAppProps.profileStatefulStack.table,
-      cognito: todoAppProps.profileStatefulStack.cognito
+      cognito: todoAppProps.profileStatefulStack.cognito,
+      profilePhotoBucket: todoAppProps.profileStatefulStack.profilePhotoBucket
     })
   }
 

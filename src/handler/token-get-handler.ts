@@ -4,7 +4,7 @@ import {
     APIGatewayProxyEvent
 } from 'aws-lambda';
 import {Env} from "../lib/env";
-import {getPathParameter, getQueryString, getSub} from "../lib/utils";
+import {getQueryString} from "../lib/utils";
 import {TokenService} from "../service/token-service";
 
 const authEndpoint = Env.get('AUTH_END_POINT')

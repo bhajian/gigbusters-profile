@@ -1,10 +1,12 @@
 export interface PhoneEntry {
     phone: string
     verified: boolean
+    verificationCode?: string
 }
 export interface EmailEntry {
     email: string
     verified: boolean
+    verificationCode?: string
 }
 export interface LocationEntry {
     latitude: number
@@ -29,7 +31,7 @@ export interface SettingEntry {
     country: string
 }
 export interface PhotoEntry {
-    photoId: string
+    photoId?: string
     bucket?: string
     key?: string
     main?: boolean

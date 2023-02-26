@@ -9,8 +9,10 @@ import {ProfileService} from "../service/profile-service";
 import {ProfileCreateParams, SocialEntry} from "../service/types";
 
 const table = Env.get('PROFILE_TABLE')
+const bucket = Env.get('PROFILE_BUCKET')
 const profileService = new ProfileService({
-    table: table
+    table: table,
+    bucket: bucket
 })
 
 export async function handler(event: APIGatewayProxyEvent, context: Context):
