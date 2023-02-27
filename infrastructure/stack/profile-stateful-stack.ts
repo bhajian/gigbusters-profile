@@ -14,7 +14,7 @@ import {Topic} from "aws-cdk-lib/aws-sns";
 export class ProfileStatefulStack extends Stack {
     public table: GenericDynamoTable
     public profilePhotoBucket: Bucket
-    public uploadProfilePhotosPolicy: PolicyStatement
+    public profilePhotosPolicy: PolicyStatement
     public cognito: FameorbitCognito
     public snsTopic: Topic
     private suffix: string;
@@ -83,11 +83,13 @@ export class ProfileStatefulStack extends Stack {
     }
 
     private initializeBucketPolicies() {
-        this.uploadProfilePhotosPolicy = new PolicyStatement({
+        this.profilePhotosPolicy = new PolicyStatement({
             effect: Effect.ALLOW,
             actions: [
                 's3:PutObject',
-                's3:PutObjectAcl'
+                's3:PutObjectAcl',
+                's3:GetObject',
+                's3:DeleteObject'
             ],
             resources: [this.profilePhotoBucket.bucketArn + '/*']
         });
@@ -97,8 +99,8 @@ export class ProfileStatefulStack extends Stack {
         this.cognito = new FameorbitCognito(this,'profileCognitoId', {
             suffixId: this.suffix
         })
-        this.cognito.addToAuthenticatedRole(this.uploadProfilePhotosPolicy)
-        this.cognito.addToAdminRole(this.uploadProfilePhotosPolicy)
+        this.cognito.addToAuthenticatedRole(this.profilePhotosPolicy)
+        this.cognito.addToAdminRole(this.profilePhotosPolicy)
     }
 
 }

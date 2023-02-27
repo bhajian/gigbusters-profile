@@ -154,7 +154,7 @@ export class ProfileService {
             photoId: photoId,
             bucket: this.props.bucket,
             key: `${params.accountId}/photos/${photoId}`,
-            main: photoParams.main
+            main: true
         }
         const response = await this.documentClient
             .get({
@@ -165,6 +165,9 @@ export class ProfileService {
             }).promise()
         if (response.Item && response.Item.userId === params.userId) {
             if(response.Item.photos){
+                response.Item.photos.map((item: PhotoEntry) => {
+                    item.main = false
+                })
                 response.Item.photos.push(newPhoto)
             } else{
                 response.Item.photos = [newPhoto]
