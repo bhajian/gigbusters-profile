@@ -242,29 +242,26 @@ export class ProfileService {
         }
     }
 
-    async setLocation(getParams: ProfileParams, location: LocationEntry):
+    async setLocation(params: ProfileParams, location: LocationEntry):
         Promise<any> {
         const response = await this.documentClient
-            .update({
+            .get({
                 TableName: this.props.table,
                 Key: {
-                    accountId: getParams.accountId,
+                    accountId: params.accountId,
                 },
-                ConditionExpression: 'userId = :userId',
-                UpdateExpression: 'set #loc.latitude=:latitude, ' +
-                    '#loc.longitude=:longitude, ' +
-                    '#loc.locationName=:locationName, ',
-                ExpressionAttributeNames: {
-                    '#loc': 'location',
-                },
-                ExpressionAttributeValues: {
-                    ':userId' : getParams.userId,
-                    ':latitude': location.latitude,
-                    ':longitude': location.longitude,
-                    ':locationName': location.locationName,
-                }
             }).promise()
-        return
+        const profile = response.Item
+        if (profile && profile.userId === params.userId) {
+            profile.location = location
+            await this.documentClient
+                .put({
+                    TableName: this.props.table,
+                    Item: profile,
+                    ConditionExpression: 'userId = :userId',
+                    ExpressionAttributeValues : {':userId' : params.userId}
+                }).promise()
+        }
     }
 
     async getLocation(params: ProfileParams): Promise<LocationEntry | {}> {
