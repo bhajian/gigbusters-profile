@@ -37,6 +37,7 @@ export class ProfileApis extends GenericApi {
     private editApi: NodejsFunction
     private deleteApi: NodejsFunction
 
+    private changeMainPhotoApi: NodejsFunction
     private addPhotoApi: NodejsFunction
     private deletePhotoApi: NodejsFunction
     private listPhotosApi: NodejsFunction
@@ -277,6 +278,20 @@ export class ProfileApis extends GenericApi {
             authorizer: props.authorizer
         })
 
+        this.changeMainPhotoApi = this.addMethod({
+            functionName: 'profile-photo-change-main',
+            handlerName: 'profile-photo-change-main-handler.ts',
+            verb: 'PUT',
+            resource: photoResource,
+            environment: {
+                PROFILE_TABLE: props.table.tableName,
+                PROFILE_BUCKET: props.profilePhotoBucket.bucketName
+            },
+            validateRequestBody: false,
+            authorizationType: AuthorizationType.COGNITO,
+            authorizer: props.authorizer
+        })
+
         this.addPhotoApi = this.addMethod({
             functionName: 'profile-photo-add',
             handlerName: 'profile-photo-add-handler.ts',
@@ -319,6 +334,7 @@ export class ProfileApis extends GenericApi {
             authorizer: props.authorizer
         })
 
+        props.table.grantFullAccess(this.changeMainPhotoApi.grantPrincipal)
         props.table.grantFullAccess(this.setMainPhotoApi.grantPrincipal)
         props.table.grantFullAccess(this.addPhotoApi.grantPrincipal)
         props.table.grantFullAccess(this.deletePhotoApi.grantPrincipal)

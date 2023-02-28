@@ -9,6 +9,7 @@ export interface EmailEntry {
     verificationCode?: string
 }
 export interface LocationEntry {
+    locationName: string
     latitude: number
     longitude: number
 }

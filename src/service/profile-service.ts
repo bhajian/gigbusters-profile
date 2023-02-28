@@ -154,7 +154,7 @@ export class ProfileService {
             photoId: photoId,
             bucket: this.props.bucket,
             key: `${params.accountId}/photos/${photoId}`,
-            main: true
+            main: photoParams.main
         }
         const response = await this.documentClient
             .get({
@@ -165,13 +165,46 @@ export class ProfileService {
             }).promise()
         if (response.Item && response.Item.userId === params.userId) {
             if(response.Item.photos){
-                response.Item.photos.map((item: PhotoEntry) => {
-                    item.main = false
-                })
+                if(photoParams.main){
+                    response.Item.photos.map((item: PhotoEntry) => {
+                        item.main = false
+                    })
+                }
                 response.Item.photos.push(newPhoto)
             } else{
                 response.Item.photos = [newPhoto]
             }
+            await this.documentClient
+                .put({
+                    TableName: this.props.table,
+                    Item: response.Item,
+                    ConditionExpression: 'userId = :userId',
+                    ExpressionAttributeValues : {':userId' : params.userId}
+                }).promise()
+        } else{
+            throw new Error('The profile was not found for this accountId' +
+                ' or the user did not match the profile owner.')
+        }
+        return newPhoto
+    }
+
+    async changeMainPhoto(params: ProfileParams): Promise<PhotoEntry> {
+        const photoId = uuidv4()
+        const newPhoto = {
+            photoId: photoId,
+            bucket: this.props.bucket,
+            key: `${params.accountId}/photos/${photoId}`,
+            main: true
+        }
+        const response = await this.documentClient
+            .get({
+                TableName: this.props.table,
+                Key: {
+                    accountId: params.accountId,
+                },
+            }).promise()
+        if (response.Item && response.Item.userId === params.userId) {
+            response.Item.photos = [newPhoto]
             await this.documentClient
                 .put({
                     TableName: this.props.table,
@@ -219,7 +252,8 @@ export class ProfileService {
                 },
                 ConditionExpression: 'userId = :userId',
                 UpdateExpression: 'set #loc.latitude=:latitude, ' +
-                    '#loc.longitude=:longitude',
+                    '#loc.longitude=:longitude, ' +
+                    '#loc.locationName=:locationName, ',
                 ExpressionAttributeNames: {
                     '#loc': 'location',
                 },
@@ -227,6 +261,7 @@ export class ProfileService {
                     ':userId' : getParams.userId,
                     ':latitude': location.latitude,
                     ':longitude': location.longitude,
+                    ':locationName': location.locationName,
                 }
             }).promise()
         return
