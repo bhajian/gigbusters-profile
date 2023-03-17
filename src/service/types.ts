@@ -35,7 +35,8 @@ export interface PhotoEntry {
     photoId?: string
     bucket?: string
     key?: string
-    main?: boolean
+    type?: string
+    identityId?: string
 }
 export interface ProfileEntity {
     accountId: string
