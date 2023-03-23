@@ -2,12 +2,17 @@ import {Construct} from "constructs";
 import {GenericCognito} from "../generic/GenericCognito";
 
 import config from "../../config/config";
+import {
+    ProviderAttribute,
+    UserPoolClientIdentityProvider,
+    UserPoolIdentityProviderGoogle
+} from "aws-cdk-lib/aws-cognito";
 
 export interface ProfileCognitoProps {
     suffixId: string
 }
 
-export class FameorbitCognito extends GenericCognito {
+export class GigbustersCognito extends GenericCognito {
     suffixId: string
 
     public constructor(scope: Construct, id: string, props: ProfileCognitoProps) {
@@ -18,8 +23,8 @@ export class FameorbitCognito extends GenericCognito {
 
     public initializeCognito(){
         this.createUserPool({
-            id: 'FameorbitUserPoolId',
-            userPoolName: `Fameorbit-UserPool-${config.envName}-${this.suffixId}`,
+            id: 'GigbustersUserPoolId',
+            userPoolName: `Gigbusters-UserPool-${config.envName}-${this.suffixId}`,
             selfSignUpEnabled: true,
             emailSignInAliases: true,
             userNameSignInAliases: true,
@@ -30,20 +35,42 @@ export class FameorbitCognito extends GenericCognito {
             envName: config.envName
         })
 
+        const provider = new UserPoolIdentityProviderGoogle(this, "MyUserPoolIdentityProviderGoogle", {
+            userPool: this.userPool,
+            clientId: config.googleClientId,
+            clientSecret: config.googleClientSecret,
+            scopes: ["email", "profile"],
+            attributeMapping: {
+                email: ProviderAttribute.GOOGLE_EMAIL,
+            },
+        })
+
+        
+
         this.createUserPoolClient({
-            id: 'FameorbitPoolClientId',
-            userPoolClientName: 'FameorbitPoolClient',
-            generateSecret: false,
+            id: 'GigbustersPoolClientId',
+            userPoolClientName: 'GigbustersPoolClient',
+            generateSecret: true,
+            supportedIdentityProviders: [
+                UserPoolClientIdentityProvider.GOOGLE,
+                UserPoolClientIdentityProvider.COGNITO
+            ],
             authFlow:{
                 adminUserPassword: true,
                 custom: true,
                 userPassword: true,
                 userSrp: true
-            }
+            },
+            oAuth: {
+                callbackUrls: config.callbackUrls,
+                logoutUrls: config.logoutUrls
+            },
         })
 
+
+
         this.initializeIdentityPool({
-            id: 'FameorbitIdentityPoolId',
+            id: 'GigbustersIdentityPoolId',
             userPool: this.userPool,
             userPoolClient: this.userPoolClient,
             allowUnauthenticatedIdentities: false,

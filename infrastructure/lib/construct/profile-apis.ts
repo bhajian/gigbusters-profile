@@ -3,7 +3,7 @@ import {GenericDynamoTable} from "../generic/GenericDynamoTable";
 import {AuthorizerProps, GenericApi} from "../generic/GenericApi";
 import {NodejsFunction} from "aws-cdk-lib/aws-lambda-nodejs";
 import {createProfileSchema, editProfileSchema} from "./profile-schema";
-import {FameorbitCognito} from "./fameorbit-cognito";
+import {GigbustersCognito} from "./gigbusters-cognito";
 import {CognitoUserPoolsAuthorizer, IResource} from "aws-cdk-lib/aws-apigateway";
 import {AuthorizationType} from "@aws-cdk/aws-apigateway";
 import config from "../../config/config";
@@ -15,7 +15,7 @@ const AUTH_API_PROTOCOL: string = 'https://'
 const OAUTH_TOKEN_API_PATH: string = '/oauth2/token'
 export interface ProfileApiProps {
     profileTable: GenericDynamoTable
-    cognito: FameorbitCognito
+    cognito: GigbustersCognito
     profilePhotoBucket: Bucket
 }
 
@@ -26,6 +26,7 @@ export interface ApiProps {
     rootResource: IResource
     idResource: IResource
     authEndpoint?: string
+    cognito?: GigbustersCognito
 }
 
 export class ProfileApis extends GenericApi {
@@ -96,7 +97,8 @@ export class ProfileApis extends GenericApi {
             rootResource: this.api.root,
             table: props.profileTable.table,
             profilePhotoBucket: props.profilePhotoBucket,
-            authEndpoint: authEndpoint
+            authEndpoint: authEndpoint,
+            cognito: props.cognito
         })
         this.initializeProfileMainApis({
             authorizer: authorizer,
@@ -158,9 +160,9 @@ export class ProfileApis extends GenericApi {
             resource: tokenResource,
             environment: {
                 AUTH_END_POINT: props.authEndpoint,
-                AUTH_CLIENT_ID: '59j60vfqh642vhqaql9kfen8hb', // FIX ME
+                AUTH_CLIENT_ID: props.cognito?.userPoolClient.userPoolClientId,
                 AUTH_GRANT_TYPE: 'authorization_code',
-                AUTH_REDIRECT_URL: 'https://api.dev2.fameorbit.com/profile/token/'
+                AUTH_REDIRECT_URL: config.callbackUrls[0]
             },
             validateRequestBody: false,
         })

@@ -33,7 +33,6 @@ export class ProfileService {
         const response = await this.documentClient
             .query({
                 TableName: this.props.table,
-                IndexName: 'userIdIndex',
                 KeyConditionExpression: 'userId = :userId',
                 ExpressionAttributeValues : {':userId' : userId}
             }).promise()
@@ -48,7 +47,7 @@ export class ProfileService {
             .get({
                 TableName: this.props.table,
                 Key: {
-                    accountId: params.accountId,
+                    userId: params.userId,
                 },
             }).promise()
         if (response.Item === undefined ||
@@ -60,7 +59,6 @@ export class ProfileService {
 
     async createProfile(params: ProfileCreateParams): Promise<ProfileEntity> {
         const profile: ProfileEntity = {
-            accountId: params.userId,
             active: true,
             ...params,
         }
@@ -90,7 +88,7 @@ export class ProfileService {
             .delete({
                 TableName: this.props.table,
                 Key: {
-                    accountId: params.accountId,
+                    userId: params.userId,
                 },
                 ConditionExpression: 'userId = :userId',
                 ExpressionAttributeValues : {':userId' : params.userId}
@@ -102,7 +100,7 @@ export class ProfileService {
             .update({
                 TableName: this.props.table,
                 Key: {
-                    accountId: params.accountId,
+                    userId: params.userId,
                 },
                 ConditionExpression: 'userId = :userId',
                 UpdateExpression: 'set active=:notActive',
@@ -118,7 +116,7 @@ export class ProfileService {
             .get({
                 TableName: this.props.table,
                 Key: {
-                    accountId: params.accountId,
+                    userId: params.userId,
                 },
             }).promise()
         if (response.Item === undefined ||
@@ -134,11 +132,10 @@ export class ProfileService {
             .get({
                 TableName: this.props.table,
                 Key: {
-                    accountId: params.accountId,
+                    userId: params.userId,
                 },
             }).promise()
-        if (response.Item && response.Item.photos &&
-            response.Item.userId == params.userId) {
+        if (response.Item && response.Item.photos) {
             const photo = response.Item.photos.find(
                 (item: PhotoEntry) => item.photoId === params.photoId)
             if (!photo)
@@ -153,7 +150,7 @@ export class ProfileService {
         const newPhoto = {
             photoId: photoId,
             bucket: this.props.bucket,
-            key: `${params.accountId}/photos/${photoId}`,
+            key: `${params.userId}/photos/${photoId}`,
             type: photoParams.type,
             identityId: photoParams.identityId,
         }
@@ -161,7 +158,7 @@ export class ProfileService {
             .get({
                 TableName: this.props.table,
                 Key: {
-                    accountId: params.accountId,
+                    userId: params.userId,
                 },
             }).promise()
         if (response.Item && response.Item.userId === params.userId) {
@@ -194,7 +191,7 @@ export class ProfileService {
         const newPhoto = {
             photoId: photoId,
             bucket: this.props.bucket,
-            key: `${params.accountId}/photos/${photoId}`,
+            key: `${params.userId}/photos/${photoId}`,
             type: photoParams.type,
             identityId: photoParams.identityId
         }
@@ -202,7 +199,7 @@ export class ProfileService {
             .get({
                 TableName: this.props.table,
                 Key: {
-                    accountId: params.accountId,
+                    userId: params.userId,
                 },
             }).promise()
         if (response.Item && response.Item.userId === params.userId) {
@@ -226,11 +223,11 @@ export class ProfileService {
             .get({
                 TableName: this.props.table,
                 Key: {
-                    accountId: params.accountId,
+                    userId: params.userId,
                 },
             }).promise()
         const profile = response.Item
-        if (profile && profile.photos && profile.userId === params.userId) {
+        if (profile && profile.photos) {
             const photosWithoutItem = profile.photos
                 .filter((item: PhotoEntry) => item.photoId != params.photoId)
             profile.photos = photosWithoutItem
@@ -250,11 +247,11 @@ export class ProfileService {
             .get({
                 TableName: this.props.table,
                 Key: {
-                    accountId: params.accountId,
+                    userId: params.userId,
                 },
             }).promise()
         const profile = response.Item
-        if (profile && profile.userId === params.userId) {
+        if (profile) {
             profile.location = location
             await this.documentClient
                 .put({
@@ -271,11 +268,11 @@ export class ProfileService {
             .get({
                 TableName: this.props.table,
                 Key: {
-                    accountId: params.accountId,
+                    userId: params.userId,
                 },
             }).promise()
         const profile = response.Item
-        if (profile && profile.location && profile.userId === params.userId) {
+        if (profile && profile.location) {
             return profile.location
         }
         return {}
@@ -287,7 +284,7 @@ export class ProfileService {
             .update({
                 TableName: this.props.table,
                 Key: {
-                    accountId: getParams.accountId,
+                    userId: getParams.userId,
                 },
                 ConditionExpression: 'userId = :userId',
                 UpdateExpression: 'set #set.notifications=:notifications, ' +
@@ -311,11 +308,11 @@ export class ProfileService {
             .get({
                 TableName: this.props.table,
                 Key: {
-                    accountId: params.accountId,
+                    userId: params.userId,
                 },
             }).promise()
         const profile = response.Item
-        if (profile && profile.settings && profile.userId === params.userId) {
+        if (profile && profile.settings) {
             return profile.settings
         }
         return {}
@@ -326,11 +323,11 @@ export class ProfileService {
             .get({
                 TableName: this.props.table,
                 Key: {
-                    accountId: params.accountId,
+                    userId: params.userId,
                 },
             }).promise()
         const profile = response.Item
-        if (profile && profile.userId === params.userId) {
+        if (profile) {
             if(profile.socialAccounts){
                 const index = profile.socialAccounts
                     .findIndex((item: SocialEntry) => (item.snName == socialParams.snName &&
@@ -362,11 +359,11 @@ export class ProfileService {
             .get({
                 TableName: this.props.table,
                 Key: {
-                    accountId: params.accountId,
+                    userId: params.userId,
                 },
             }).promise()
         const profile = response.Item
-        if (profile && profile.socialAccounts && profile.userId === params.userId) {
+        if (profile && profile.socialAccounts) {
             const index = profile.socialAccounts
                 .findIndex((item: SocialEntry) => (item.snName === params.snName &&
                     item.socialUserId === params.socialUserId))
@@ -389,12 +386,11 @@ export class ProfileService {
             .get({
                 TableName: this.props.table,
                 Key: {
-                    accountId: params.accountId,
+                    userId: params.userId,
                 },
             }).promise()
         if (response.Item === undefined ||
-            response.Item.socialAccounts === undefined ||
-            response.Item.userId != params.userId) {
+            response.Item.socialAccounts === undefined) {
             return []
         }
         return response.Item.socialAccounts as SocialEntry[]
@@ -405,7 +401,7 @@ export class ProfileService {
             .update({
                 TableName: this.props.table,
                 Key: {
-                    accountId: params.accountId,
+                    userId: params.userId,
                 },
                 ConditionExpression: 'userId = :userId ',
                 UpdateExpression: 'ADD #ic :ic ',
@@ -425,7 +421,7 @@ export class ProfileService {
             .update({
                 TableName: this.props.table,
                 Key: {
-                    accountId: params.accountId,
+                    userId: params.userId,
                 },
                 ConditionExpression: 'userId = :userId ',
                 UpdateExpression: 'DELETE #ic :ic ',
@@ -446,12 +442,11 @@ export class ProfileService {
             .get({
                 TableName: this.props.table,
                 Key: {
-                    accountId: params.accountId,
+                    userId: params.userId,
                 },
             }).promise()
         if (response.Item === undefined ||
-            response.Item.interestedCategories === undefined ||
-            response.Item.userId != params.userId) {
+            response.Item.interestedCategories === undefined) {
             return [] as string[]
         }
         return response.Item.interestedCategories as string[]
@@ -506,7 +501,7 @@ export class ProfileService {
                 .get({
                     TableName: this.props.table,
                     Key: {
-                        accountId: params.accountId,
+                        userId: params.userId,
                     },
                 }).promise()
             if(!beforeValidation.Item){

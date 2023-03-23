@@ -2,5 +2,13 @@
   "hosted-zone:account=341450653870:domainName=fameorbit.com:region=us-east-1": {
     "Id": "/hostedzone/Z0159389IYPKTLGATG20",
     "Name": "fameorbit.com."
+  },
+  "hosted-zone:account=341450653870:domainName=gigbuster.app:region=us-east-1": {
+    "Id": "/hostedzone/Z093052225N0R8MHGA8TK",
+    "Name": "gigbuster.app."
+  },
+  "hosted-zone:account=341450653870:domainName=gigbusters.app:region=us-east-1": {
+    "Id": "/hostedzone/Z02377812V3D4DH5NTNG2",
+    "Name": "gigbusters.app."
   }
 }

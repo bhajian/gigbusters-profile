@@ -39,8 +39,8 @@ export interface PhotoEntry {
     identityId?: string
 }
 export interface ProfileEntity {
-    accountId: string
     userId: string
+    reviewableId?: string
     active: boolean
     accountType: string
     subscription: string
@@ -73,22 +73,18 @@ export interface ProfileCreateParams {
     settings: SettingEntry
 }
 export interface ProfileParams {
-    accountId: string
     userId: string
 }
 export interface PhotoParams {
     photoId: string
-    accountId: string
     userId: string
 }
 export interface SocialParams {
     snName: string
     socialUserId: string
-    accountId: string
     userId: string
 }
 export interface CategoryParams {
     category: string
-    accountId: string
     userId: string
 }

@@ -131,10 +131,10 @@ export const createProfileSchema = {
 export const editProfileSchema = {
     type: JsonSchemaType.OBJECT,
     required: [
-        "accountId", "accountType", "subscription", "name", "email",
+        "userId", "accountType", "subscription", "name", "email",
     ],
     properties: {
-        accountId: {
+        userId: {
             type: JsonSchemaType.STRING
         },
         accountType: {

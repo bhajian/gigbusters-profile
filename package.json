@@ -1,8 +1,8 @@
 {
-  "name": "todo-app",
+  "name": "gigbusters-profile",
   "version": "0.1.0",
   "bin": {
-    "todo-app": "infrastructure/bin/todo-app.js"
+    "gigbusters-profile": "infrastructure/bin/gigbusters-profile.js"
   },
   "scripts": {
     "build": "tsc",

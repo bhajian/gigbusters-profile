@@ -5,7 +5,7 @@ import {
     CfnIdentityPoolRoleAttachment,
     CfnUserPoolGroup,
     UserPool,
-    UserPoolClient, UserPoolEmail, VerificationEmailStyle
+    UserPoolClient, UserPoolClientIdentityProvider, UserPoolEmail, VerificationEmailStyle
 } from "aws-cdk-lib/aws-cognito";
 import {aws_route53_targets, CfnOutput, RemovalPolicy} from "aws-cdk-lib";
 import {CognitoUserPoolsAuthorizer} from "aws-cdk-lib/aws-apigateway";
@@ -32,11 +32,16 @@ export interface UserPoolClientProps {
     id: string
     userPoolClientName: string
     generateSecret: boolean
+    supportedIdentityProviders: UserPoolClientIdentityProvider[]
     authFlow:{
         adminUserPassword: boolean
         custom: boolean
         userPassword: boolean
         userSrp: boolean
+    },
+    oAuth: {
+        callbackUrls: any[]
+        logoutUrls: any[]
     }
 }
 
@@ -72,26 +77,26 @@ export class GenericCognito extends Construct{
             email: UserPoolEmail.withCognito('support@orbitstellar.com'), // FIX ME
             userVerification: {
                 emailSubject: 'Verify your email to access your account!',
-                emailBody: 'Thanks for signing up to the Tietap app! Your verification code is {####}',
+                emailBody: 'Thanks for signing up to the Gig Busters app! Your verification code is {####}',
                 emailStyle: VerificationEmailStyle.CODE,
-                smsMessage: 'Thanks for signing up to the Tietap app! Your verification code is {####}',
+                smsMessage: 'Thanks for signing up to the Gig Busters app! Your verification code is {####}',
             },
             standardAttributes: {
                 email: {
                     required: true,
-                    mutable: false,
+                    mutable: true,
                 },
                 phoneNumber: {
-                    required: true,
-                    mutable: false,
+                    required: false,
+                    mutable: true,
                 },
                 givenName: {
                     required: false,
-                    mutable: false,
+                    mutable: true,
                 },
                 familyName: {
                     required: false,
-                    mutable: false,
+                    mutable: true,
                 },
             },
             signInAliases: {
@@ -132,17 +137,10 @@ export class GenericCognito extends Construct{
             props.id,
             {
             userPoolClientName: props.userPoolClientName,
-            authFlows: {
-                adminUserPassword: props.authFlow.adminUserPassword,
-                custom: props.authFlow.custom,
-                userPassword: props.authFlow.userPassword,
-                userSrp: props.authFlow.userSrp
-            },
-            oAuth:{
-                callbackUrls: ['https://api.dev2.fameorbit.com/profile/token/'], // FIX ME
-                logoutUrls: ['https://dev2.fameorbit.com/signout/']
-            },
-            generateSecret: false
+            authFlows: props.authFlow,
+            oAuth: props.oAuth,
+            supportedIdentityProviders: props.supportedIdentityProviders,
+            generateSecret: false,
         });
         new CfnOutput(this, 'UserPoolClientId', {
             value: this.userPoolClient.userPoolClientId

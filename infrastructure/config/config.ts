@@ -10,6 +10,11 @@ interface Env {
     authDomainCertificateArn: string | undefined
     authSubdomain: string | undefined
     basePath: string | undefined
+    googleClientId: string | undefined
+    googleClientSecret: string | undefined
+    googleMapsKey: string | undefined
+    callbackUrls: any[] | undefined
+    logoutUrls: any[] | undefined
 }
 
 interface AppConfig {
@@ -22,6 +27,11 @@ interface AppConfig {
     authDomainCertificateArn: string
     authSubdomain: string
     basePath: string
+    googleClientId: string
+    googleClientSecret: string
+    googleMapsKey: string
+    callbackUrls: any[]
+    logoutUrls: any[]
 }
 
 const getConfig = (): Env => {
@@ -34,7 +44,12 @@ const getConfig = (): Env => {
         apiSubdomain: configFile.apiSubdomain,
         authDomainCertificateArn: configFile.authDomainCertificateArn,
         authSubdomain: configFile.authSubdomain,
-        basePath: configFile.basePath
+        basePath: configFile.basePath,
+        googleClientId: configFile.googleClientId,
+        googleClientSecret: configFile.googleClientSecret,
+        googleMapsKey: configFile.googleMapsKey,
+        callbackUrls: configFile.callbackUrls,
+        logoutUrls: configFile.logoutUrls,
     };
 };
 

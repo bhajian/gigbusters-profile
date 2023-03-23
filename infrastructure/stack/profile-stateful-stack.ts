@@ -4,7 +4,7 @@ import {Construct} from 'constructs';
 import {Bucket, HttpMethods} from "aws-cdk-lib/aws-s3";
 import {Effect, PolicyStatement} from "aws-cdk-lib/aws-iam";
 import {GenericDynamoTable} from "../lib/generic/GenericDynamoTable";
-import {FameorbitCognito} from "../lib/construct/fameorbit-cognito";
+import {GigbustersCognito} from "../lib/construct/gigbusters-cognito";
 import {AttributeType, StreamViewType} from "aws-cdk-lib/aws-dynamodb";
 import {ARecord, HostedZone, RecordTarget} from "aws-cdk-lib/aws-route53";
 import config from "../config/config";
@@ -15,7 +15,7 @@ export class ProfileStatefulStack extends Stack {
     public table: GenericDynamoTable
     public profilePhotoBucket: Bucket
     public profilePhotosPolicy: PolicyStatement
-    public cognito: FameorbitCognito
+    public cognito: GigbustersCognito
     public snsTopic: Topic
     private suffix: string;
 
@@ -27,7 +27,7 @@ export class ProfileStatefulStack extends Stack {
         this.initializeDynamodbTable()
         this.initializeBucketPolicies()
         this.initializeCognito()
-        this.snsTopic = new Topic(this, 'Topic')
+        this.snsTopic = new Topic(this, 'SnsTopic')
 
     }
 
@@ -52,14 +52,9 @@ export class ProfileStatefulStack extends Stack {
     private initializeDynamodbTable() {
         this.table = new GenericDynamoTable(this, 'ProfileDynamoDBTable', {
             tableName: `Profile-${config.envName}-${this.suffix}` ,
-            primaryKey: 'accountId',
+            primaryKey: 'userId',
             stream: StreamViewType.NEW_AND_OLD_IMAGES,
             keyType: AttributeType.STRING
-        })
-        this.table.addSecondaryIndexes({
-            indexName: 'userIdIndex',
-            partitionKeyName: 'userId',
-            partitionKeyType: AttributeType.STRING
         })
     }
 
@@ -96,7 +91,7 @@ export class ProfileStatefulStack extends Stack {
     }
 
     private initializeCognito() {
-        this.cognito = new FameorbitCognito(this,'profileCognitoId', {
+        this.cognito = new GigbustersCognito(this,'profileCognitoId', {
             suffixId: this.suffix
         })
         this.cognito.addToAuthenticatedRole(this.profilePhotosPolicy)
