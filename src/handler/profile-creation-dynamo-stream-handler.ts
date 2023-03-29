@@ -15,8 +15,7 @@ export async function handler(event: any) {
         const record = event.Records[i]
         if(record.eventName === 'INSERT'){
             const unmarshalledProfile = DynamoDB.Converter.unmarshall(record.dynamodb.NewImage)
-            const res = await profileService.createReviewable(unmarshalledProfile)
-            console.log(res)
+            await profileService.createReviewable(unmarshalledProfile)
         }
     }
 }

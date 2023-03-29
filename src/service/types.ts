@@ -41,7 +41,8 @@ export interface PhotoEntry {
 export interface ProfileEntity {
     userId: string
     reviewableId?: string
-    active: boolean
+    active?: boolean
+    createdDateTime?: string
     accountType: string
     subscription: string
     name: string
@@ -56,22 +57,7 @@ export interface ProfileEntity {
     interestedCategories: string[]
     settings: SettingEntry
 }
-export interface ProfileCreateParams {
-    userId: string
-    accountType: string
-    subscription: string
-    name: string
-    accountCode: string
-    bio: string
-    phone: PhoneEntry
-    email: EmailEntry
-    address: AddressEntry
-    location: LocationEntry
-    photos: PhotoEntry[]
-    socialAccounts: SocialEntry[]
-    interestedCategories: string[]
-    settings: SettingEntry
-}
+
 export interface ProfileParams {
     userId: string
 }

@@ -6,7 +6,7 @@ import {
 import {getEventBody, getPathParameter, getSub} from "../lib/utils";
 import {Env} from "../lib/env";
 import {ProfileService} from "../service/profile-service";
-import {ProfileCreateParams} from "../service/types";
+import {ProfileEntity} from "../service/types";
 
 const table = Env.get('PROFILE_TABLE')
 const bucket = Env.get('PROFILE_BUCKET')
@@ -29,7 +29,7 @@ export async function handler(event: APIGatewayProxyEvent, context: Context):
         body: 'Empty!'
     }
     try {
-        const item = getEventBody(event) as ProfileCreateParams
+        const item = getEventBody(event) as ProfileEntity
         const sub = getSub(event)
         item.userId = sub
         const profile = await profileService.createProfile(item)

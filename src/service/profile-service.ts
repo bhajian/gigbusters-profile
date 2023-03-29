@@ -6,7 +6,6 @@ import {
     PhotoParams,
     SocialParams,
     CategoryParams,
-    ProfileCreateParams,
     ProfileEntity,
     SettingEntry,
     SocialEntry,
@@ -64,9 +63,11 @@ export class ProfileService {
         return response.Item as ProfileEntity
     }
 
-    async createProfile(params: ProfileCreateParams): Promise<ProfileEntity> {
+    async createProfile(params: ProfileEntity): Promise<ProfileEntity> {
+        const now = new Date()
         const profile: ProfileEntity = {
             active: true,
+            createdDateTime: now.toISOString(),
             ...params,
         }
         profile.accountCode = await this.generateAccountId(params.userId)
@@ -80,7 +81,7 @@ export class ProfileService {
     }
 
     async editProfile(params: ProfileEntity): Promise<ProfileEntity> {
-        const response = await this.documentClient
+        await this.documentClient
             .put({
                 TableName: this.props.table,
                 Item: params,
@@ -581,6 +582,17 @@ export class ProfileService {
                     'Content-Type': 'application/json',
                 }
             })
+
+            profile.reviewableId = res.data.id
+
+            await this.documentClient
+                .put({
+                    TableName: this.props.table,
+                    Item: profile,
+                    ConditionExpression: 'userId = :userId',
+                    ExpressionAttributeValues : {':userId' : profile.userId}
+                }).promise()
+
             return res.data
         } catch (error) {
             throw error

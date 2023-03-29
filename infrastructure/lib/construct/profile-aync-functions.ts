@@ -38,5 +38,7 @@ export class ProfileAyncFunction extends GenericAsyncFunction {
             this.props.profileTable.table, {
                 startingPosition: StartingPosition.LATEST,
             }))
+
+        this.props.profileTable.table.grantFullAccess(this.profileCreationStream.grantPrincipal)
     }
 }

@@ -56,6 +56,11 @@ export class ProfileStatefulStack extends Stack {
             stream: StreamViewType.NEW_AND_OLD_IMAGES,
             keyType: AttributeType.STRING
         })
+        this.table.addSecondaryIndexes({
+            indexName: 'shortcodeIndex',
+            partitionKeyName: 'accountCode',
+            partitionKeyType: AttributeType.STRING,
+        })
     }
 
     private initializeProfilePhotosBucket() {

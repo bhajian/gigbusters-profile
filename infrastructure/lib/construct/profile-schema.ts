@@ -15,6 +15,9 @@ export const createProfileSchema = {
         name: {
             type: JsonSchemaType.STRING
         },
+        createdDateTime: {
+            type: JsonSchemaType.STRING
+        },
         accountCode: {
             type: JsonSchemaType.STRING
         },
@@ -144,6 +147,9 @@ export const editProfileSchema = {
             type: JsonSchemaType.STRING
         },
         name: {
+            type: JsonSchemaType.STRING
+        },
+        createdDateTime: {
             type: JsonSchemaType.STRING
         },
         accountCode: {
