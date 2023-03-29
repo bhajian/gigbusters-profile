@@ -29,9 +29,7 @@ export async function handler(event: APIGatewayProxyEvent, context: Context):
     try {
         const item = getEventBody(event) as any
         const sub = getSub(event)
-        const accountId = getPathParameter(event, 'accountId')
         item.userId = sub
-        item.accountId = accountId
         const profile = await profileService.requestValidation(item)
         result.body = JSON.stringify(profile)
     } catch (error) {

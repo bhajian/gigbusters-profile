@@ -28,9 +28,7 @@ export async function handler(event: APIGatewayProxyEvent, context: Context):
     }
     try{
         const userId = getSub(event)
-        const accountId = getPathParameter(event, 'accountId')
         const items = await profileService.listCategory({
-            accountId: accountId,
             userId: userId
         })
 

@@ -27,10 +27,8 @@ export async function handler(event: APIGatewayProxyEvent, context: Context):
         body: ''
     }
     try {
-        const accountId = getPathParameter(event, 'accountId')
         const sub = getSub(event)
             const profile = await profileService.getProfile({
-                accountId: accountId,
                 userId: sub
             })
             result.body = JSON.stringify(profile)

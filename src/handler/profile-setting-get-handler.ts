@@ -28,9 +28,7 @@ export async function handler(event: APIGatewayProxyEvent, context: Context):
     }
     try{
         const userId = getSub(event)
-        const accountId = getPathParameter(event, 'accountId')
         const photos = await profileService.listPhotos({
-            accountId: accountId,
             userId: userId
         })
 

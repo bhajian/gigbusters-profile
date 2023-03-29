@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios from "axios"
 
 interface TokenServiceProps{
     authEndpoint: string
@@ -8,7 +8,7 @@ interface TokenServiceProps{
 }
 
 interface GetTokenProps{
-    code: string
+    code?: string
 }
 
 export class TokenService {
@@ -23,7 +23,7 @@ export class TokenService {
         try {
             const params = new URLSearchParams({ });
             params.append('client_id', this.serviceProps.clientId)
-            params.append('code', props.code)
+            params.append('code', props.code? props.code : '')
             params.append('grant_type', this.serviceProps.grantType)
             params.append('redirect_uri', this.serviceProps.redirectUrl)
             let res = await axios({

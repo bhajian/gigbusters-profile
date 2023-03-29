@@ -27,12 +27,10 @@ export async function handler(event: APIGatewayProxyEvent, context: Context):
         body: 'Empty!'
     }
     try {
-        const accountId = getPathParameter(event, 'accountId')
         const sub = getSub(event)
         const location = getEventBody(event) as LocationEntry
 
         const res = await profileService.setLocation({
-            accountId: accountId,
             userId: sub,
         }, location)
         result.body = JSON.stringify({success: true})

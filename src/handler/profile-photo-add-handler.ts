@@ -27,12 +27,10 @@ export async function handler(event: APIGatewayProxyEvent, context: Context):
         body: 'Empty!'
     }
     try {
-        const accountId = getPathParameter(event, 'accountId')
         const sub = getSub(event)
         const item = getEventBody(event) as PhotoEntry
 
         const newPhoto = await profileService.addPhoto({
-            accountId: accountId,
             userId: sub,
         }, item)
         result.body = JSON.stringify(newPhoto)

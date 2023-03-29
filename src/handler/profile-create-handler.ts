@@ -10,9 +10,11 @@ import {ProfileCreateParams} from "../service/types";
 
 const table = Env.get('PROFILE_TABLE')
 const bucket = Env.get('PROFILE_BUCKET')
+const shortcodeApiUrl = Env.get('SHORTCODE_API_URL')
 const profileService = new ProfileService({
     table: table,
-    bucket: bucket
+    bucket: bucket,
+    shortcodeApiUrl: shortcodeApiUrl
 })
 
 export async function handler(event: APIGatewayProxyEvent, context: Context):

@@ -189,7 +189,7 @@ export class ProfileApis extends GenericApi {
             resource: props.idResource,
             environment: {
                 PROFILE_TABLE: props.table.tableName,
-                PROFILE_BUCKET: props.profilePhotoBucket.bucketName
+                PROFILE_BUCKET: props.profilePhotoBucket.bucketName,
             },
             validateRequestBody: false,
             authorizationType: AuthorizationType.COGNITO,
@@ -203,7 +203,8 @@ export class ProfileApis extends GenericApi {
             resource: props.rootResource,
             environment: {
                 PROFILE_TABLE: props.table.tableName,
-                PROFILE_BUCKET: props.profilePhotoBucket.bucketName
+                PROFILE_BUCKET: props.profilePhotoBucket.bucketName,
+                SHORTCODE_API_URL: config.shortCodeUrl
             },
             validateRequestBody: true,
             bodySchema: createProfileSchema,

@@ -15,6 +15,8 @@ interface Env {
     googleMapsKey: string | undefined
     callbackUrls: any[] | undefined
     logoutUrls: any[] | undefined
+    shortCodeUrl: string | undefined
+    reviewableUrl: string | undefined
 }
 
 interface AppConfig {
@@ -32,6 +34,8 @@ interface AppConfig {
     googleMapsKey: string
     callbackUrls: any[]
     logoutUrls: any[]
+    shortCodeUrl: string
+    reviewableUrl: string
 }
 
 const getConfig = (): Env => {
@@ -50,6 +54,8 @@ const getConfig = (): Env => {
         googleMapsKey: configFile.googleMapsKey,
         callbackUrls: configFile.callbackUrls,
         logoutUrls: configFile.logoutUrls,
+        shortCodeUrl: configFile.shortCodeUrl,
+        reviewableUrl: configFile.reviewableUrl,
     };
 };
 

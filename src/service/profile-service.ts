@@ -1,6 +1,5 @@
-import { DocumentClient, ScanInput } from 'aws-sdk/clients/dynamodb'
+import { DocumentClient } from 'aws-sdk/clients/dynamodb'
 import { v4 as uuidv4 } from 'uuid'
-import {ExternalError} from "../lib/error";
 import {
     LocationEntry,
     PhotoEntry,
@@ -12,12 +11,15 @@ import {
     SettingEntry,
     SocialEntry,
     ProfileParams
-} from "./types";
-import SNS from "aws-sdk/clients/sns";
+} from "./types"
+import SNS from "aws-sdk/clients/sns"
+import axios from "axios"
 
 interface ProfileServiceProps{
     table: string
     bucket: string
+    shortcodeApiUrl?: string
+    reviewApiUrl?: string
 }
 
 export class ProfileService {
@@ -29,12 +31,17 @@ export class ProfileService {
         this.props = props
     }
 
-    async listProfile(userId: string): Promise<ProfileEntity[]> {
+    async listProfile(params: any): Promise<ProfileEntity[]> {
         const response = await this.documentClient
-            .query({
+            .scan({
                 TableName: this.props.table,
-                KeyConditionExpression: 'userId = :userId',
-                ExpressionAttributeValues : {':userId' : userId}
+                ProjectionExpression: 'userId, name, phone, email, ' +
+                    'photos, location',
+                FilterExpression: 'userId <> :userId',
+                ExpressionAttributeValues : {':userId' : params.userId},
+                ExpressionAttributeNames: { "#name": "name", '#location': 'location' },
+                Limit: params.Limit,
+                ExclusiveStartKey: params.lastEvaluatedKey
             }).promise()
         if (response.Items === undefined) {
             return [] as ProfileEntity[]
@@ -62,9 +69,9 @@ export class ProfileService {
             active: true,
             ...params,
         }
-        profile.accountCode = this.generateAccountId()
+        profile.accountCode = await this.generateAccountId(params.userId)
 
-        const response = await this.documentClient
+        await this.documentClient
             .put({
                 TableName: this.props.table,
                 Item: profile,
@@ -458,7 +465,7 @@ export class ProfileService {
                 .get({
                     TableName: this.props.table,
                     Key: {
-                        accountId: params.accountId,
+                        userId: params.userId,
                     },
                 }).promise()
             if(!response.Item){
@@ -536,14 +543,49 @@ export class ProfileService {
         }
     }
 
-    private generateAccountId(): string{
-        const rand1 = Math.floor(Math.random() * 1000)
-        const rand2 = Date.now()
-        const number = rand2 * Math.pow(10,4) + rand1
-        const strNumber = number.toString()
-        return strNumber.slice(strNumber.length - 9 , strNumber.length)
+    private async generateAccountId(userId: string): Promise<string>{
+        try {
+            let res = await axios({
+                url: this.props.shortcodeApiUrl,
+                method: 'PUT',
+                timeout: 8000,
+                data: {
+                    uri: `profile/${userId}`,
+                    type: 'profile'
+                },
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            return res.data.shortcode
+        } catch (error) {
+            throw error
+        }
     }
 
+    public async createReviewable(profile: any): Promise<string>{
+        try {
+            let res = await axios({
+                url: this.props.reviewApiUrl,
+                method: 'POST',
+                timeout: 8000,
+                data: {
+                    uri: profile.accountCode,
+                    type: 'profile',
+                    cumulativeRating: 0,
+                    numberOfReviews: 0,
+                    reviewableStatus: 'active',
+                    createdbyUserId: profile.userId
+                },
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            return res.data
+        } catch (error) {
+            throw error
+        }
+    }
     private generateRandomCode(): string{
         const rand1 = Math.floor(Math.random() * 1000000)
         const strNumber = rand1.toString()

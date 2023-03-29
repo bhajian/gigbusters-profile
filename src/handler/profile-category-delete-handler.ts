@@ -26,11 +26,9 @@ export async function handler(event: APIGatewayProxyEvent, context: Context):
         body: 'Hello From Todo Edit Api!'
     }
     try {
-        const accountId = getPathParameter(event, 'accountId')
         const category = getPathParameter(event, 'categoryId')
         const sub = getSub(event)
         await profileService.deleteCategory({
-            accountId: accountId,
             userId: sub,
             category: category
         })

@@ -26,11 +26,9 @@ export async function handler(event: APIGatewayProxyEvent, context: Context):
         body: 'Hello From Todo Edit Api!'
     }
     try {
-        const accountId = getPathParameter(event, 'accountId')
         const photoId = getPathParameter(event, 'photoId')
         const sub = getSub(event)
         const photo = await profileService.getPhoto({
-            accountId: accountId,
             userId: sub,
             photoId: photoId
         })

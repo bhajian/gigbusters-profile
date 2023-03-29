@@ -27,12 +27,10 @@ export async function handler(event: APIGatewayProxyEvent, context: Context):
         body: 'Empty!'
     }
     try {
-        const accountId = getPathParameter(event, 'accountId')
         const sub = getSub(event)
         const social: SocialEntry = getEventBody(event)
 
         const socialAccount = await profileService.addSocial({
-            accountId: accountId,
             userId: sub,
         },social)
         result.body = JSON.stringify(socialAccount)

@@ -26,10 +26,8 @@ export async function handler(event: APIGatewayProxyEvent, context: Context):
         body: 'Hello From Todo Edit Api!'
     }
     try {
-        const accountId = getPathParameter(event, 'accountId')
         const sub = getSub(event)
         await profileService.deactivateProfile({
-            accountId: accountId,
             userId: sub,
         })
         result.body = JSON.stringify({'success': true})

@@ -27,12 +27,10 @@ export async function handler(event: APIGatewayProxyEvent, context: Context):
         body: 'Empty!'
     }
     try {
-        const accountId = getPathParameter(event, 'accountId')
         const sub = getSub(event)
         const body = getEventBody(event)
 
         await profileService.addCategory({
-            accountId: accountId,
             userId: sub,
             category: body.category
         })

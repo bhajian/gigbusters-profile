@@ -26,12 +26,10 @@ export async function handler(event: APIGatewayProxyEvent, context: Context):
         body: 'Hello From Todo Edit Api!'
     }
     try {
-        const accountId = getPathParameter(event, 'accountId')
         const socialUserId = getPathParameter(event, 'socialUserId')
         const snName = getPathParameter(event, 'snName')
         const sub = getSub(event)
         await profileService.deleteSocial({
-            accountId: accountId,
             userId: sub,
             snName: snName,
             socialUserId: socialUserId
