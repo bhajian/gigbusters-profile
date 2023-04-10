@@ -34,8 +34,8 @@ export class ProfileService {
         const response = await this.documentClient
             .scan({
                 TableName: this.props.table,
-                ProjectionExpression: 'userId, name, phone, email, ' +
-                    'photos, location',
+                ProjectionExpression: 'userId, #name, phone, email, ' +
+                    'photos, #location, accountCode',
                 FilterExpression: 'userId <> :userId',
                 ExpressionAttributeValues : {':userId' : params.userId},
                 ExpressionAttributeNames: { "#name": "name", '#location': 'location' },
@@ -572,11 +572,11 @@ export class ProfileService {
                 timeout: 8000,
                 data: {
                     uri: profile.accountCode,
-                    type: 'profile',
+                    type: 'gigbusters',
                     cumulativeRating: 0,
                     numberOfReviews: 0,
                     reviewableStatus: 'active',
-                    createdbyUserId: profile.userId
+                    userId: profile.userId
                 },
                 headers: {
                     'Content-Type': 'application/json',
