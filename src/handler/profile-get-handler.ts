@@ -28,13 +28,12 @@ export async function handler(event: APIGatewayProxyEvent, context: Context):
     }
     try {
         const sub = getSub(event)
-            const profile = await profileService.getProfile({
-                userId: sub
-            })
-            result.body = JSON.stringify(profile)
-            return result
-        }
-
+        const profile = await profileService.getProfile({
+            userId: sub
+        })
+        result.body = JSON.stringify(profile)
+        return result
+    }
     catch (e) {
         result.statusCode = 500
         result.body = e.message

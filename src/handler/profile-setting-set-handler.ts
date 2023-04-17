@@ -3,9 +3,10 @@ import {
     APIGatewayProxyResult,
     APIGatewayProxyEvent
 } from 'aws-lambda';
-import {getPathParameter, getSub} from "../lib/utils";
+import {getEventBody, getPathParameter, getSub} from "../lib/utils";
 import {Env} from "../lib/env";
 import {ProfileService} from "../service/profile-service";
+import {LocationEntry, SettingEntry} from "../service/types";
 
 const table = Env.get('PROFILE_TABLE')
 const bucket = Env.get('PROFILE_BUCKET')
@@ -27,6 +28,12 @@ export async function handler(event: APIGatewayProxyEvent, context: Context):
     }
     try {
         const sub = getSub(event)
+        const settings = getEventBody(event) as SettingEntry
+
+        await profileService.setSetting({
+            userId: sub,
+        }, settings)
+        result.body = JSON.stringify({success: true})
 
     } catch (error) {
         result.statusCode = 500

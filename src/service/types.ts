@@ -28,6 +28,9 @@ export interface SocialEntry {
 }
 export interface SettingEntry {
     notifications: boolean
+    showMyPhoneOnPublicProfile: boolean
+    showMyEmailOnPublicProfile: boolean
+    allowReceivingUnknownMessages: boolean
     language: string
     country: string
 }

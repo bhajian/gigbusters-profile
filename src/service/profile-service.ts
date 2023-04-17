@@ -289,25 +289,23 @@ export class ProfileService {
     async setSetting(getParams: ProfileParams, setting: SettingEntry):
         Promise<any> {
         const response = await this.documentClient
-            .update({
+            .get({
                 TableName: this.props.table,
                 Key: {
                     userId: getParams.userId,
                 },
-                ConditionExpression: 'userId = :userId',
-                UpdateExpression: 'set #set.notifications=:notifications, ' +
-                    '#set.language=:language, ' +
-                    '#set.country=:country',
-                ExpressionAttributeNames: {
-                    '#set': 'settings',
-                },
-                ExpressionAttributeValues: {
-                    ':userId' : getParams.userId,
-                    ':country': setting.country,
-                    ':language': setting.language,
-                    ':notifications': setting.notifications,
-                }
             }).promise()
+        const profile = response.Item
+        if (profile) {
+            profile.settings = setting
+            await this.documentClient
+                .put({
+                    TableName: this.props.table,
+                    Item: profile,
+                    ConditionExpression: 'userId = :userId',
+                    ExpressionAttributeValues : {':userId' : getParams.userId}
+                }).promise()
+        }
         return
     }
 
