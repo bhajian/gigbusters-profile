@@ -28,8 +28,8 @@ export interface SocialEntry {
 }
 export interface SettingEntry {
     notifications: boolean
-    showMyPhoneOnPublicProfile: boolean
-    showMyEmailOnPublicProfile: boolean
+    showMyEmailPublicly: boolean
+    showMyPhonePublicly: boolean
     allowPublicMessages: boolean
     language: string
     country: string
