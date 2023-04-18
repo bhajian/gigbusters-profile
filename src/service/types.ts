@@ -30,7 +30,7 @@ export interface SettingEntry {
     notifications: boolean
     showMyPhoneOnPublicProfile: boolean
     showMyEmailOnPublicProfile: boolean
-    allowReceivingUnknownMessages: boolean
+    allowPublicMessages: boolean
     language: string
     country: string
 }
