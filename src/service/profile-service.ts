@@ -64,13 +64,16 @@ export class ProfileService {
     }
 
     async createProfile(params: ProfileEntity): Promise<ProfileEntity> {
+        const p = await this.getProfile({
+            userId: params.userId
+        })
         const now = new Date()
         const profile: ProfileEntity = {
             active: true,
             createdDateTime: now.toISOString(),
             ...params,
         }
-        profile.accountCode = await this.generateAccountId(params.userId)
+        profile.accountCode = (p.accountCode ? p.accountCode : await this.generateAccountId(params.userId))
 
         await this.documentClient
             .put({

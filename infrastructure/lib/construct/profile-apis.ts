@@ -206,8 +206,8 @@ export class ProfileApis extends GenericApi {
                 PROFILE_BUCKET: props.profilePhotoBucket.bucketName,
                 SHORTCODE_API_URL: config.shortCodeUrl
             },
-            validateRequestBody: true,
-            bodySchema: createProfileSchema,
+            validateRequestBody: false,
+            // bodySchema: createProfileSchema,
             authorizationType: AuthorizationType.COGNITO,
             authorizer: props.authorizer
         })
@@ -221,8 +221,8 @@ export class ProfileApis extends GenericApi {
                 PROFILE_TABLE: props.table.tableName,
                 PROFILE_BUCKET: props.profilePhotoBucket.bucketName
             },
-            validateRequestBody: true,
-            bodySchema: editProfileSchema,
+            validateRequestBody: false,
+            // bodySchema: editProfileSchema,
             authorizationType: AuthorizationType.COGNITO,
             authorizer: props.authorizer
         })

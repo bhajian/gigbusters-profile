@@ -28,7 +28,7 @@ export async function handler(event: APIGatewayProxyEvent, context: Context):
         body: 'Hello From Todo Edit Api!'
     }
     try {
-        const item = getEventBody(event) as ProfileEntity;
+        const item = getEventBody(event) as ProfileEntity
         const sub = getSub(event)
         item.userId = sub
         const profile = await profileService.editProfile(item)
