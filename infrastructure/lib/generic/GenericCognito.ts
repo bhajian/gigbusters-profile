@@ -5,7 +5,7 @@ import {
     CfnIdentityPoolRoleAttachment,
     CfnUserPoolGroup,
     UserPool,
-    UserPoolClient, UserPoolEmail, VerificationEmailStyle
+    UserPoolClient, UserPoolClientIdentityProvider, UserPoolEmail, VerificationEmailStyle
 } from "aws-cdk-lib/aws-cognito";
 import {aws_route53_targets, CfnOutput, RemovalPolicy} from "aws-cdk-lib";
 import {CognitoUserPoolsAuthorizer} from "aws-cdk-lib/aws-apigateway";
@@ -13,6 +13,7 @@ import {FederatedPrincipal, Role} from "aws-cdk-lib/aws-iam";
 import {PolicyStatement} from "aws-cdk-lib/aws-iam/lib/policy-statement";
 import {Certificate} from "aws-cdk-lib/aws-certificatemanager";
 import {ARecord, HostedZone, RecordTarget} from "aws-cdk-lib/aws-route53";
+import {UserPoolDomainTarget} from "aws-cdk-lib/aws-route53-targets";
 
 export interface UserPoolProps {
     id: string
@@ -24,17 +25,23 @@ export interface UserPoolProps {
     certificateArn: string
     authSubdomain: string
     rootDomain: string
+    envName: string
 }
 
 export interface UserPoolClientProps {
     id: string
     userPoolClientName: string
     generateSecret: boolean
+    supportedIdentityProviders: UserPoolClientIdentityProvider[]
     authFlow:{
         adminUserPassword: boolean
         custom: boolean
         userPassword: boolean
         userSrp: boolean
+    },
+    oAuth: {
+        callbackUrls: any[]
+        logoutUrls: any[]
     }
 }
 
@@ -67,29 +74,29 @@ export class GenericCognito extends Construct{
             removalPolicy: RemovalPolicy.DESTROY,
             userPoolName: props.userPoolName,
             selfSignUpEnabled: props.selfSignUpEnabled,
-            email: UserPoolEmail.withCognito('support@myawesomeapp.com'),
+            email: UserPoolEmail.withCognito('support@orbitstellar.com'), // FIX ME
             userVerification: {
-                emailSubject: 'Verify your email for our awesome app!',
-                emailBody: 'Thanks for signing up to our awesome app! Your verification code is {####}',
+                emailSubject: 'Verify your email to access your account!',
+                emailBody: 'Thanks for signing up to the Gig Busters app! Your verification code is {####}',
                 emailStyle: VerificationEmailStyle.CODE,
-                smsMessage: 'Thanks for signing up to our awesome app! Your verification code is {####}',
+                smsMessage: 'Thanks for signing up to the Gig Busters app! Your verification code is {####}',
             },
             standardAttributes: {
                 email: {
                     required: true,
-                    mutable: false,
+                    mutable: true,
                 },
                 phoneNumber: {
-                    required: true,
-                    mutable: false,
+                    required: false,
+                    mutable: true,
                 },
                 givenName: {
                     required: false,
-                    mutable: false,
+                    mutable: true,
                 },
                 familyName: {
                     required: false,
-                    mutable: false,
+                    mutable: true,
                 },
             },
             signInAliases: {
@@ -105,7 +112,7 @@ export class GenericCognito extends Construct{
 
         const userPoolDomain = this.userPool.addDomain('UserPoolCustomDomain', {
             customDomain: {
-                domainName: [props.authSubdomain, props.rootDomain].join('.'),
+                domainName: [props.authSubdomain, props.envName, props.rootDomain].join('.'),
                 certificate: cert,
             },
         })
@@ -116,8 +123,8 @@ export class GenericCognito extends Construct{
 
         new ARecord(this, 'authARecordId', {
             zone: hostedZone,
-            recordName: props.authSubdomain,
-            target: RecordTarget.fromAlias(new aws_route53_targets.UserPoolDomainTarget(userPoolDomain)),
+            recordName: [props.authSubdomain, props.envName].join('.'),
+            target: RecordTarget.fromAlias(new UserPoolDomainTarget(userPoolDomain)),
         })
 
         new CfnOutput(this, 'UserPoolId', {
@@ -130,13 +137,10 @@ export class GenericCognito extends Construct{
             props.id,
             {
             userPoolClientName: props.userPoolClientName,
-            authFlows: {
-                adminUserPassword: props.authFlow.adminUserPassword,
-                custom: props.authFlow.custom,
-                userPassword: props.authFlow.userPassword,
-                userSrp: props.authFlow.userSrp
-            },
-            generateSecret: false
+            authFlows: props.authFlow,
+            oAuth: props.oAuth,
+            supportedIdentityProviders: props.supportedIdentityProviders,
+            generateSecret: false,
         });
         new CfnOutput(this, 'UserPoolClientId', {
             value: this.userPoolClient.userPoolClientId
@@ -179,7 +183,10 @@ export class GenericCognito extends Construct{
                 },
                 'sts:AssumeRoleWithWebIdentity'
             )
-        });
+        })
+        new CfnOutput(this, 'cognito-identitypool-authenticated-role-arn', {
+            value: this.authenticatedRole.roleArn
+        })
 
         this.unAuthenticatedRole = new Role(this, 'CognitoDefaultUnAuthenticatedRole', {
             assumedBy: new FederatedPrincipal('cognito-identity.amazonaws.com', {
@@ -192,7 +199,10 @@ export class GenericCognito extends Construct{
                 },
                 'sts:AssumeRoleWithWebIdentity'
             )
-        });
+        })
+        new CfnOutput(this, 'cognito-identitypool-unauthenticated-role-arn', {
+            value: this.unAuthenticatedRole.roleArn
+        })
 
         this.adminRole = new Role(this, 'CognitoAdminRole', {
             assumedBy: new FederatedPrincipal('cognito-identity.amazonaws.com', {
@@ -206,6 +216,10 @@ export class GenericCognito extends Construct{
                 'sts:AssumeRoleWithWebIdentity'
             )
         })
+        new CfnOutput(this, 'cognito-identitypool-admin-role-arn', {
+            value: this.adminRole.roleArn
+        })
+
     }
 
     protected attachRoles(){

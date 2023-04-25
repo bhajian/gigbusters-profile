@@ -5,7 +5,7 @@ import {
 } from 'aws-lambda';
 import {Env} from "../lib/env";
 import {ProfileService} from "../service/profile-service";
-import {getPathParameter, getQueryString, getSub} from "../lib/utils";
+import {getSub} from "../lib/utils";
 
 const table = Env.get('PROFILE_TABLE')
 const bucket = Env.get('PROFILE_BUCKET')
@@ -26,12 +26,13 @@ export async function handler(event: APIGatewayProxyEvent, context: Context):
         },
         body: ''
     }
-    try {
-        const sub = getSub(event)
-        const profile = await profileService.getProfile({
-            userId: sub
+    try{
+        const userId = getSub(event)
+        const items = await profileService.listSocial({
+            userId: userId
         })
-        result.body = JSON.stringify(profile)
+
+        result.body = JSON.stringify(items)
         return result
     }
     catch (e) {

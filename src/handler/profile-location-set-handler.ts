@@ -3,9 +3,10 @@ import {
     APIGatewayProxyResult,
     APIGatewayProxyEvent
 } from 'aws-lambda';
+import {getEventBody, getPathParameter, getSub} from "../lib/utils";
 import {Env} from "../lib/env";
 import {ProfileService} from "../service/profile-service";
-import {getPathParameter, getQueryString, getSub} from "../lib/utils";
+import {LocationEntry} from "../service/types";
 
 const table = Env.get('PROFILE_TABLE')
 const bucket = Env.get('PROFILE_BUCKET')
@@ -16,7 +17,6 @@ const profileService = new ProfileService({
 
 export async function handler(event: APIGatewayProxyEvent, context: Context):
     Promise<APIGatewayProxyResult> {
-
     const result: APIGatewayProxyResult = {
         statusCode: 200,
         headers: {
@@ -24,19 +24,19 @@ export async function handler(event: APIGatewayProxyEvent, context: Context):
             'Access-Control-Allow-Headers': '*',
             'Access-Control-Allow-Methods': '*'
         },
-        body: ''
+        body: 'Empty!'
     }
     try {
         const sub = getSub(event)
-        const profile = await profileService.getProfile({
-            userId: sub
-        })
-        result.body = JSON.stringify(profile)
-        return result
-    }
-    catch (e) {
+        const location = getEventBody(event) as LocationEntry
+
+        const res = await profileService.setLocation({
+            userId: sub,
+        }, location)
+        result.body = JSON.stringify({success: true})
+    } catch (error) {
         result.statusCode = 500
-        result.body = e.message
+        result.body = error.message
     }
     return result
 }

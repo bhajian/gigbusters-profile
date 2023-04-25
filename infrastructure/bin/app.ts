@@ -12,7 +12,7 @@ const statefulStack = new ProfileStatefulStack(app, 'ProfileStatefulStack', {
         region: process.env.CDK_DEFAULT_REGION
     }})
 new ProfileApiStack(app, 'ProfileApiStack', {
-    todoAppStatefulStack: statefulStack,
+    profileStatefulStack: statefulStack,
 }, {
     env: {
         account: process.env.CDK_DEFAULT_ACCOUNT,

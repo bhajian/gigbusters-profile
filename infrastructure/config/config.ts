@@ -1,7 +1,7 @@
 
 const configFile = require('./dev.json')
 interface Env {
-    env: string | undefined
+    envName: string | undefined
     account: string | undefined
     region: string | undefined
     apiDomainCertificateArn: string | undefined
@@ -10,10 +10,17 @@ interface Env {
     authDomainCertificateArn: string | undefined
     authSubdomain: string | undefined
     basePath: string | undefined
+    googleClientId: string | undefined
+    googleClientSecret: string | undefined
+    googleMapsKey: string | undefined
+    callbackUrls: any[] | undefined
+    logoutUrls: any[] | undefined
+    shortCodeUrl: string | undefined
+    reviewableUrl: string | undefined
 }
 
 interface AppConfig {
-    env: string
+    envName: string
     account: string
     region: string
     apiDomainCertificateArn: string
@@ -22,11 +29,18 @@ interface AppConfig {
     authDomainCertificateArn: string
     authSubdomain: string
     basePath: string
+    googleClientId: string
+    googleClientSecret: string
+    googleMapsKey: string
+    callbackUrls: any[]
+    logoutUrls: any[]
+    shortCodeUrl: string
+    reviewableUrl: string
 }
 
 const getConfig = (): Env => {
     return {
-        env: configFile.envName ? configFile.envName : 'dev' ,
+        envName: configFile.envName ? configFile.envName : 'dev' ,
         account: configFile.account ? configFile.account : 'dev' ,
         region: configFile.region ? configFile.region : 'us-east-1' ,
         apiDomainCertificateArn: configFile.apiDomainCertificateArn,
@@ -34,7 +48,14 @@ const getConfig = (): Env => {
         apiSubdomain: configFile.apiSubdomain,
         authDomainCertificateArn: configFile.authDomainCertificateArn,
         authSubdomain: configFile.authSubdomain,
-        basePath: configFile.basePath
+        basePath: configFile.basePath,
+        googleClientId: configFile.googleClientId,
+        googleClientSecret: configFile.googleClientSecret,
+        googleMapsKey: configFile.googleMapsKey,
+        callbackUrls: configFile.callbackUrls,
+        logoutUrls: configFile.logoutUrls,
+        shortCodeUrl: configFile.shortCodeUrl,
+        reviewableUrl: configFile.reviewableUrl,
     };
 };
 

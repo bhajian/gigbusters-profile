@@ -4,14 +4,19 @@ import {
     APIGatewayProxyEvent
 } from 'aws-lambda';
 import {Env} from "../lib/env";
-import {ProfileService} from "../service/profile-service";
-import {getPathParameter, getQueryString, getSub} from "../lib/utils";
+import {getQueryString} from "../lib/utils";
+import {TokenService} from "../service/token-service";
 
-const table = Env.get('PROFILE_TABLE')
-const bucket = Env.get('PROFILE_BUCKET')
-const profileService = new ProfileService({
-    table: table,
-    bucket: bucket
+const authEndpoint = Env.get('AUTH_END_POINT')
+const authClientId = Env.get('AUTH_CLIENT_ID')
+const authGrantType = Env.get('AUTH_GRANT_TYPE')
+const authRedirectUrl = Env.get('AUTH_REDIRECT_URL')
+
+const service = new TokenService({
+    authEndpoint: authEndpoint,
+    clientId: authClientId,
+    grantType: authGrantType,
+    redirectUrl: authRedirectUrl
 })
 
 export async function handler(event: APIGatewayProxyEvent, context: Context):
@@ -27,15 +32,16 @@ export async function handler(event: APIGatewayProxyEvent, context: Context):
         body: ''
     }
     try {
-        const sub = getSub(event)
-        const profile = await profileService.getProfile({
-            userId: sub
+        const code = getQueryString(event, 'code')
+        const token = await service.getToken({
+            code: code
         })
-        result.body = JSON.stringify(profile)
+        result.body = JSON.stringify(token)
         return result
     }
     catch (e) {
         result.statusCode = 500
+        console.error(e)
         result.body = e.message
     }
     return result

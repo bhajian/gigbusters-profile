@@ -5,7 +5,7 @@ import {
 } from 'aws-lambda';
 import {Env} from "../lib/env";
 import {ProfileService} from "../service/profile-service";
-import {getPathParameter, getQueryString, getSub} from "../lib/utils";
+import {getEventBody, getPathParameter, getSub} from "../lib/utils";
 
 const table = Env.get('PROFILE_TABLE')
 const bucket = Env.get('PROFILE_BUCKET')
@@ -16,7 +16,6 @@ const profileService = new ProfileService({
 
 export async function handler(event: APIGatewayProxyEvent, context: Context):
     Promise<APIGatewayProxyResult> {
-
     const result: APIGatewayProxyResult = {
         statusCode: 200,
         headers: {
@@ -24,19 +23,22 @@ export async function handler(event: APIGatewayProxyEvent, context: Context):
             'Access-Control-Allow-Headers': '*',
             'Access-Control-Allow-Methods': '*'
         },
-        body: ''
+        body: 'Hello From Todo Edit Api!'
     }
     try {
+        const socialUserId = getPathParameter(event, 'socialUserId')
+        const snName = getPathParameter(event, 'snName')
         const sub = getSub(event)
-        const profile = await profileService.getProfile({
-            userId: sub
+        await profileService.deleteSocial({
+            userId: sub,
+            snName: snName,
+            socialUserId: socialUserId
         })
-        result.body = JSON.stringify(profile)
-        return result
-    }
-    catch (e) {
+        result.body = JSON.stringify({success: true})
+    } catch (error) {
+        console.error(error.message)
         result.statusCode = 500
-        result.body = e.message
+        result.body = error.message
     }
     return result
 }

@@ -35,7 +35,8 @@ export function  getPathParameter(event: APIGatewayProxyEvent, parameter: string
         ? event['pathParameters'][parameter]
         : undefined
     if (!value) {
-        throw new ExternalError(400, `Path must contain path parameter ${parameter}.`)
+        throw new ExternalError(400,
+            `Path must contain path parameter ${parameter}.`)
     }
     return value
 }
@@ -46,9 +47,6 @@ export function getQueryString(event: APIGatewayProxyEvent,
     const {queryStringParameters} = event;
     if (queryStringParameters) {
         value = queryStringParameters[parameter!];
-    }
-    if (!value) {
-        throw new ExternalError(400, `Path must contain path parameter ${parameter}.`)
     }
     return value
 }

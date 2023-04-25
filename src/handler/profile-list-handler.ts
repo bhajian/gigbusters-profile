@@ -4,12 +4,14 @@ import {
     APIGatewayProxyEvent
 } from 'aws-lambda';
 import {Env} from "../lib/env";
-import {ProfileService} from "../service/ProfileService";
-import {getPathParameter, getQueryString, getSub} from "../lib/utils";
+import {ProfileService} from "../service/profile-service";
+import {getQueryString, getSub} from "../lib/utils";
 
 const table = Env.get('PROFILE_TABLE')
+const bucket = Env.get('PROFILE_BUCKET')
 const profileService = new ProfileService({
-    table: table
+    table: table,
+    bucket: bucket
 })
 
 export async function handler(event: APIGatewayProxyEvent, context: Context):
@@ -26,7 +28,13 @@ export async function handler(event: APIGatewayProxyEvent, context: Context):
     }
     try{
         const userId = getSub(event)
-        const profiles = await profileService.list(userId)
+        const limit = getQueryString(event, 'limit')
+        const lastEvaluatedKey = getQueryString(event, 'lastEvaluatedKey')
+        const profiles = await profileService.listProfile({
+            userId: userId,
+            limit: limit,
+            lastEvaluatedKey: lastEvaluatedKey
+        })
 
         result.body = JSON.stringify(profiles)
         return result

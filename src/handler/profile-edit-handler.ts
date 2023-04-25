@@ -5,12 +5,14 @@ import {
 } from 'aws-lambda';
 import {getEventBody, getSub} from "../lib/utils";
 import {Env} from "../lib/env";
-import {ProfileService} from "../service/ProfileService";
-import {ProfileEditParams} from "../service/types";
+import {ProfileService} from "../service/profile-service";
+import {ProfileEntity} from "../service/types";
 
 const table = Env.get('PROFILE_TABLE')
-const todoService = new ProfileService({
-    table: table
+const bucket = Env.get('PROFILE_BUCKET')
+const profileService = new ProfileService({
+    table: table,
+    bucket: bucket
 })
 
 export async function handler(event: APIGatewayProxyEvent, context: Context):
@@ -26,10 +28,10 @@ export async function handler(event: APIGatewayProxyEvent, context: Context):
         body: 'Hello From Todo Edit Api!'
     }
     try {
-        const item = getEventBody(event) as ProfileEditParams;
+        const item = getEventBody(event) as ProfileEntity
         const sub = getSub(event)
         item.userId = sub
-        const profile = await todoService.edit(item)
+        const profile = await profileService.editProfile(item)
         result.body = JSON.stringify(profile)
     } catch (error) {
         result.statusCode = 500

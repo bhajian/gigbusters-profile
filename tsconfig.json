@@ -4,7 +4,11 @@
     "module": "commonjs",
     "skipLibCheck": true,
     "types": ["node"],
-    "lib": ["es2018", "es6"],
+    "lib": [
+      "es2018",
+      "es6",
+      "dom"
+    ],
     "esModuleInterop": true,
     "declaration": true,
     "strict": true,
