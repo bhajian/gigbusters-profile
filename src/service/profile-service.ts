@@ -30,7 +30,14 @@ export class ProfileService {
         this.props = props
     }
 
-    async listProfile(params: any): Promise<ProfileEntity[]> {
+    async listProfile(params: any): Promise<any> {
+        let exclusiveStartKey
+        if(params?.lastEvaluatedKey){
+            exclusiveStartKey = {
+                userId: params?.lastEvaluatedKey
+            }
+        }
+
         const response = await this.documentClient
             .scan({
                 TableName: this.props.table,
@@ -39,13 +46,13 @@ export class ProfileService {
                 FilterExpression: 'userId <> :userId',
                 ExpressionAttributeValues : {':userId' : params.userId},
                 ExpressionAttributeNames: { "#name": "name", '#location': 'location' },
-                Limit: params.Limit,
-                ExclusiveStartKey: params.lastEvaluatedKey
+                Limit: params.limit,
+                ExclusiveStartKey: exclusiveStartKey
             }).promise()
         if (response.Items === undefined) {
-            return [] as ProfileEntity[]
+            return {}
         }
-        return response.Items as ProfileEntity[]
+        return response
     }
 
     async getProfile(params: ProfileParams): Promise<ProfileEntity> {

@@ -32,10 +32,9 @@ export async function handler(event: APIGatewayProxyEvent, context: Context):
         const lastEvaluatedKey = getQueryString(event, 'lastEvaluatedKey')
         const profiles = await profileService.listProfile({
             userId: userId,
-            limit: limit,
+            limit: (limit? limit : 100),
             lastEvaluatedKey: lastEvaluatedKey
         })
-
         result.body = JSON.stringify(profiles)
         return result
     }
