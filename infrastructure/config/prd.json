@@ -1,0 +1,18 @@
+{
+  "envName": "prd",
+  "account": "341450653870",
+  "region": "us-east-1",
+  "apiDomainCertificateArn": "arn:aws:acm:us-east-1:341450653870:certificate/56ddab86-5b15-4760-b5dd-8627cf729cdb",
+  "rootDomain": "gigbusters.app",
+  "apiSubdomain": "api",
+  "authDomainCertificateArn": "arn:aws:acm:us-east-1:341450653870:certificate/56ddab86-5b15-4760-b5dd-8627cf729cdb",
+  "authSubdomain": "auth",
+  "basePath": "profile",
+  "googleClientId": "129724835623-l4j1r0h3723ohsb64esq555ie56rubq0.apps.googleusercontent.com",
+  "googleClientSecret": "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",
+  "googleMapsKey": "AIzaSyBPwz2HLlWGxU6vZrGNcFiyD23-tawiH0s",
+  "callbackUrls": ["https://api.prd.gigbusters.app/profile/token/"],
+  "logoutUrls": ["https://prd.gigbusters.app/signout/"],
+  "shortCodeUrl": "https://api.prd.gigbusters.app/shortcode/",
+  "reviewableUrl": "https://api.prd.gigbusters.app/reviewable/"
+}

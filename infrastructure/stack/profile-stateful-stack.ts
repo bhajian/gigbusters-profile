@@ -9,8 +9,6 @@ import {AttributeType, StreamViewType} from "aws-cdk-lib/aws-dynamodb";
 import {ARecord, HostedZone, RecordTarget} from "aws-cdk-lib/aws-route53";
 import config from "../config/config";
 import {Topic} from "aws-cdk-lib/aws-sns";
-
-
 export class ProfileStatefulStack extends Stack {
     public table: GenericDynamoTable
     public profilePhotoBucket: Bucket

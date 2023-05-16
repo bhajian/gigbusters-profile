@@ -24,7 +24,7 @@ export class GigbustersCognito extends GenericCognito {
     public initializeCognito(){
         this.createUserPool({
             id: 'GigbustersUserPoolId',
-            userPoolName: `Gigbusters-UserPool-${config.envName}-${this.suffixId}`,
+            userPoolName: `Gigbusters-${config.envName}-UserPool-${this.suffixId}`,
             selfSignUpEnabled: true,
             emailSignInAliases: true,
             userNameSignInAliases: true,
@@ -45,14 +45,13 @@ export class GigbustersCognito extends GenericCognito {
             },
         })
 
-        
-
-        this.createUserPoolClient({
+        const userPoolClient = this.createUserPoolClient({
             id: 'GigbustersPoolClientId',
             userPoolClientName: 'GigbustersPoolClient',
             generateSecret: true,
             supportedIdentityProviders: [
                 UserPoolClientIdentityProvider.GOOGLE,
+                // UserPoolClientIdentityProvider.APPLE,
                 UserPoolClientIdentityProvider.COGNITO
             ],
             authFlow:{
@@ -67,7 +66,7 @@ export class GigbustersCognito extends GenericCognito {
             },
         })
 
-
+        userPoolClient.node.addDependency(provider)
 
         this.initializeIdentityPool({
             id: 'GigbustersIdentityPoolId',

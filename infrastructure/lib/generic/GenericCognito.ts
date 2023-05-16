@@ -145,6 +145,7 @@ export class GenericCognito extends Construct{
         new CfnOutput(this, 'UserPoolClientId', {
             value: this.userPoolClient.userPoolClientId
         })
+        return this.userPoolClient
     }
 
     protected createAdminsGroup(){
