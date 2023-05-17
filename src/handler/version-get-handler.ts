@@ -19,7 +19,7 @@ export async function handler(event: APIGatewayProxyEvent, context: Context):
     }
     try {
 
-        result.body = JSON.stringify({version: '1.0.8'})
+        result.body = JSON.stringify({version: '1.0.7'})
         return result
     }
     catch (e) {
