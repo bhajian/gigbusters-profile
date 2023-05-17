@@ -31,7 +31,7 @@ export interface ApiProps {
 
 export class ProfileApis extends GenericApi {
     private tokenApi: NodejsFunction
-
+    private versionApi: NodejsFunction
     private listApi: NodejsFunction
     private getApi: NodejsFunction
     private createApi: NodejsFunction
@@ -153,6 +153,7 @@ export class ProfileApis extends GenericApi {
 
     private initializeTokenApis(props: ApiProps) {
         const tokenResource = props.rootResource.addResource('token')
+        const versionResource = props.rootResource.addResource('version')
         this.tokenApi = this.addMethod({
             functionName: 'token-get',
             handlerName: 'token-get-handler.ts',
@@ -163,6 +164,16 @@ export class ProfileApis extends GenericApi {
                 AUTH_CLIENT_ID: props.cognito?.userPoolClient.userPoolClientId,
                 AUTH_GRANT_TYPE: 'authorization_code',
                 AUTH_REDIRECT_URL: config.callbackUrls[0]
+            },
+            validateRequestBody: false,
+        })
+        this.tokenApi = this.addMethod({
+            functionName: 'version-get',
+            handlerName: 'version-get-handler.ts',
+            verb: 'GET',
+            resource: versionResource,
+            environment: {
+
             },
             validateRequestBody: false,
         })
